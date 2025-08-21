@@ -23,6 +23,25 @@ get_header();
     global $wpdb;
     $selected_year = isset($_GET['ano']) ? (int) $_GET['ano'] : 0;
     $years = $wpdb->get_col("SELECT DISTINCT YEAR(meta_value) FROM {$wpdb->postmeta} pm INNER JOIN {$wpdb->posts} p ON pm.post_id = p.ID WHERE pm.meta_key = 'data_hora' AND p.post_type = 'reuniao' AND p.post_status = 'publish' ORDER BY meta_value DESC");
+
+    $meeting_ids_year = array();
+    if ($selected_year) {
+        $meeting_ids_year = get_posts(array(
+            'post_type'      => 'reuniao',
+            'post_status'    => 'publish',
+            'posts_per_page' => -1,
+            'fields'         => 'ids',
+            'meta_query'     => array(
+                array(
+                    'key'     => 'data_hora',
+                    'value'   => array($selected_year . '-01-01', $selected_year . '-12-31 23:59:59'),
+                    'compare' => 'BETWEEN',
+                    'type'    => 'DATETIME',
+                ),
+            ),
+        ));
+    }
+
     if ($years) :
     ?>
         <div class="d-flex justify-content-center gap-2 mb-4" aria-label="<?php esc_attr_e('Filtrar por ano', 'agert'); ?>">
@@ -157,15 +176,28 @@ get_header();
 
         <div class="tab-pane fade" id="documentos-pane" role="tabpanel" aria-labelledby="documentos-tab">
             <?php
-            $attachments = new WP_Query(array(
+            $docs_paged = isset($_GET['docs_page']) ? max(1, (int) $_GET['docs_page']) : 1;
+            $doc_args   = array(
                 'post_type'      => 'anexo',
-                'posts_per_page' => -1,
+                'posts_per_page' => 9,
+                'paged'          => $docs_paged,
                 'post_status'    => 'publish',
                 'orderby'        => 'date',
                 'order'          => 'DESC',
-            ));
+            );
 
-            if ($attachments->have_posts()) :
+            if (!empty($meeting_ids_year)) {
+                $doc_args['meta_query'][] = array(
+                    'key'     => '_reuniao_id',
+                    'value'   => $meeting_ids_year,
+                    'compare' => 'IN',
+                );
+            }
+
+            $attachments = new WP_Query($doc_args);
+
+            if ($attachments->have_posts()) {
+                echo '<div class="document-list">';
                 while ($attachments->have_posts()) : $attachments->the_post();
                     $reuniao_id = get_post_meta(get_the_ID(), '_reuniao_id', true);
                     $meeting    = $reuniao_id ? get_post($reuniao_id) : null;
@@ -183,22 +215,47 @@ get_header();
                     );
                     get_template_part('parts/reunioes/row-documento', null, array('doc' => $doc, 'meeting' => $meeting));
                 endwhile;
-            else :
+                echo '</div>';
+
+                if ($attachments->max_num_pages > 1) {
+                    echo paginate_links(array(
+                        'base'      => esc_url(add_query_arg('docs_page', '%#%')),
+                        'format'    => '',
+                        'current'   => $docs_paged,
+                        'total'     => $attachments->max_num_pages,
+                        'type'      => 'list',
+                        'prev_text' => '<i class="bi bi-chevron-left"></i> ' . __('Anterior', 'agert'),
+                        'next_text' => __('Próxima', 'agert') . ' <i class="bi bi-chevron-right"></i>',
+                    ));
+                }
+            } else {
                 get_template_part('parts/reunioes/empty-state');
-            endif;
+            }
             wp_reset_postdata();
             ?>
         </div>
 
         <div class="tab-pane fade" id="videos-pane" role="tabpanel" aria-labelledby="videos-tab">
             <?php
-            $videos_query = new WP_Query(array(
+            $videos_page = isset($_GET['videos_page']) ? max(1, (int) $_GET['videos_page']) : 1;
+            $video_args  = array(
                 'post_type'      => 'reuniao_video',
-                'posts_per_page' => -1,
+                'posts_per_page' => 9,
+                'paged'          => $videos_page,
                 'post_status'    => 'publish',
-            ));
+            );
 
-            if ($videos_query->have_posts()) :
+            if (!empty($meeting_ids_year)) {
+                $video_args['meta_query'][] = array(
+                    'key'     => 'reuniao_relacionada',
+                    'value'   => $meeting_ids_year,
+                    'compare' => 'IN',
+                );
+            }
+
+            $videos_query = new WP_Query($video_args);
+
+            if ($videos_query->have_posts()) {
                 echo '<div class="row row-cols-1 row-cols-md-3 g-4">';
                 while ($videos_query->have_posts()) : $videos_query->the_post();
                     $meeting_id = get_post_meta(get_the_ID(), 'reuniao_relacionada', true);
@@ -229,9 +286,21 @@ get_header();
 
                 endwhile;
                 echo '</div>';
-            else :
+
+                if ($videos_query->max_num_pages > 1) {
+                    echo paginate_links(array(
+                        'base'      => esc_url(add_query_arg('videos_page', '%#%')),
+                        'format'    => '',
+                        'current'   => $videos_page,
+                        'total'     => $videos_query->max_num_pages,
+                        'type'      => 'list',
+                        'prev_text' => '<i class="bi bi-chevron-left"></i> ' . __('Anterior', 'agert'),
+                        'next_text' => __('Próxima', 'agert') . ' <i class="bi bi-chevron-right"></i>',
+                    ));
+                }
+            } else {
                 get_template_part('parts/reunioes/empty-state');
-            endif;
+            }
             wp_reset_postdata();
             ?>
         </div>
@@ -239,6 +308,23 @@ get_header();
     </div>
 
     <div class="row mt-5 g-4 info-bottom">
+        <div class="col-md-6">
+            <h5><?php _e('Informações sobre as Reuniões', 'agert'); ?></h5>
+            <h6 class="mt-3"><?php _e('Reuniões Ordinárias', 'agert'); ?></h6>
+            <p class="mb-1"><?php _e('As reuniões ordinárias da AGERT acontecem mensalmente, sempre na segunda terça-feira do mês, às 14h00.', 'agert'); ?></p>
+            <p class="mb-1"><?php _e('Sede da AGERT - Sala de Reuniões', 'agert'); ?></p>
+            <p class="mb-0"><?php _e('Rua Principal, 123 - Centro', 'agert'); ?></p>
+        </div>
+        <div class="col-md-6">
+            <h5><?php _e('Participação Pública', 'agert'); ?></h5>
+            <p class="mb-1"><?php _e('As reuniões são abertas ao público e transmitidas ao vivo pelo canal oficial da AGERT no YouTube.', 'agert'); ?></p>
+            <p class="mb-0"><?php _e('Para participar presencialmente, entre em contato conosco através dos canais oficiais com antecedência mínima de 48h.', 'agert'); ?></p>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row g-4 info-bottom">
         <div class="col-md-6">
             <h5><?php _e('Informações sobre as Reuniões', 'agert'); ?></h5>
             <h6 class="mt-3"><?php _e('Reuniões Ordinárias', 'agert'); ?></h6>
