@@ -201,6 +201,12 @@ get_header();
                 while ($attachments->have_posts()) : $attachments->the_post();
                     $reuniao_id = get_post_meta(get_the_ID(), '_reuniao_id', true);
                     $meeting    = $reuniao_id ? get_post($reuniao_id) : null;
+                    if ($selected_year && $meeting) {
+                        $m_date = agert_meta($meeting->ID, 'data_hora');
+                        if ($m_date && (int) date('Y', strtotime($m_date)) !== $selected_year) {
+                            continue;
+                        }
+                    }
                     $arquivo_id = (int) get_post_meta(get_the_ID(), '_arquivo_id', true);
                     $doc        = array(
                         'rotulo'      => get_the_title(),
@@ -254,6 +260,12 @@ get_header();
                 while ($videos_query->have_posts()) : $videos_query->the_post();
                     $meeting_id = get_post_meta(get_the_ID(), 'reuniao_relacionada', true);
                     $meeting    = $meeting_id ? get_post($meeting_id) : null;
+                    if ($selected_year && $meeting) {
+                        $m_date = agert_meta($meeting_id, 'data_hora');
+                        if ($m_date && (int) date('Y', strtotime($m_date)) !== $selected_year) {
+                            continue;
+                        }
+                    }
                     echo '<div class="col">';
                     get_template_part('parts/reunioes/card-video', null, array(
                         'meeting' => $meeting,
@@ -293,6 +305,21 @@ get_header();
             ?>
         </div>
 
+    </div>
+
+    <div class="row mt-5 g-4 info-bottom">
+        <div class="col-md-6">
+            <h5><?php _e('Informações sobre as Reuniões', 'agert'); ?></h5>
+            <h6 class="mt-3"><?php _e('Reuniões Ordinárias', 'agert'); ?></h6>
+            <p class="mb-1"><?php _e('As reuniões ordinárias da AGERT acontecem mensalmente, sempre na segunda terça-feira do mês, às 14h00.', 'agert'); ?></p>
+            <p class="mb-1"><?php _e('Sede da AGERT - Sala de Reuniões', 'agert'); ?></p>
+            <p class="mb-0"><?php _e('Rua Principal, 123 - Centro', 'agert'); ?></p>
+        </div>
+        <div class="col-md-6">
+            <h5><?php _e('Participação Pública', 'agert'); ?></h5>
+            <p class="mb-1"><?php _e('As reuniões são abertas ao público e transmitidas ao vivo pelo canal oficial da AGERT no YouTube.', 'agert'); ?></p>
+            <p class="mb-0"><?php _e('Para participar presencialmente, entre em contato conosco através dos canais oficiais com antecedência mínima de 48h.', 'agert'); ?></p>
+        </div>
     </div>
 </div>
 
