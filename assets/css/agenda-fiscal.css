@@ -1,0 +1,7 @@
+.post-type-archive-agenda_fiscal { background: var(--bg); }
+
+.agenda-card { border: 1px solid var(--line); border-radius: 12px; }
+
+.agenda-card .badge { background: var(--brand); }
+
+.agenda-card small { color: var(--muted); }
