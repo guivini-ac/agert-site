@@ -14,12 +14,31 @@ get_header();
         <?php agert_back_button(); ?>
         <?php agert_breadcrumb(); ?>
     </div>
-    <h1 class="mb-4"><?php _e('Acervo', 'agert'); ?></h1>
+    <h1 class="mb-2"><?php _e('Acervo', 'agert'); ?></h1>
+    <p class="text-center text-muted mb-4">
+        <?php _e('Acompanhe as atas, resoluções, relatórios e vídeos das reuniões da AGERT. Todos os documentos estão disponíveis para download em formato PDF.', 'agert'); ?>
+    </p>
+    <?php
+    // Filtro por ano
+    global $wpdb;
+    $selected_year = isset($_GET['ano']) ? (int) $_GET['ano'] : 0;
+    $years = $wpdb->get_col("SELECT DISTINCT YEAR(meta_value) FROM {$wpdb->postmeta} pm INNER JOIN {$wpdb->posts} p ON pm.post_id = p.ID WHERE pm.meta_key = 'data_hora' AND p.post_type = 'reuniao' AND p.post_status = 'publish' ORDER BY meta_value DESC");
+    if ($years) :
+    ?>
+        <div class="d-flex justify-content-center gap-2 mb-4" aria-label="<?php esc_attr_e('Filtrar por ano', 'agert'); ?>">
+            <?php foreach ($years as $year) :
+                $link = add_query_arg('ano', $year);
+                $classes = 'btn btn-sm ' . ($selected_year === (int) $year ? 'btn-dark text-white' : 'btn-outline-dark');
+            ?>
+                <a href="<?php echo esc_url($link); ?>" class="<?php echo esc_attr($classes); ?>"><?php echo esc_html($year); ?></a>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
 
     <nav class="tabbar mb-4" aria-label="<?php esc_attr_e('Seções do acervo', 'agert'); ?>">
         <div class="nav nav-tabs" id="acervoTabs" role="tablist">
             <button class="nav-link active" id="reunioes-tab" data-bs-toggle="tab" data-bs-target="#reunioes-pane" type="button" role="tab" aria-controls="reunioes-pane" aria-selected="true"><?php _e('Reuniões', 'agert'); ?></button>
-            <button class="nav-link" id="anexos-tab" data-bs-toggle="tab" data-bs-target="#anexos-pane" type="button" role="tab" aria-controls="anexos-pane" aria-selected="false"><?php _e('Anexos', 'agert'); ?></button>
+            <button class="nav-link" id="documentos-tab" data-bs-toggle="tab" data-bs-target="#documentos-pane" type="button" role="tab" aria-controls="documentos-pane" aria-selected="false"><?php _e('Documentos', 'agert'); ?></button>
             <button class="nav-link" id="videos-tab" data-bs-toggle="tab" data-bs-target="#videos-pane" type="button" role="tab" aria-controls="videos-pane" aria-selected="false"><?php _e('Vídeos', 'agert'); ?></button>
         </div>
     </nav>
@@ -45,12 +64,25 @@ get_header();
                 's'              => $search,
             );
 
+            $meta_query = array();
+            if ($selected_year) {
+                $meta_query[] = array(
+                    'key'     => 'data_hora',
+                    'value'   => array($selected_year . '-01-01', $selected_year . '-12-31 23:59:59'),
+                    'compare' => 'BETWEEN',
+                    'type'    => 'DATETIME',
+                );
+            }
+
             if ($date) {
-                $args['meta_query'][] = array(
+                $meta_query[] = array(
                     'key'     => 'data_hora',
                     'value'   => $date,
                     'compare' => 'LIKE',
                 );
+            }
+            if ($meta_query) {
+                $args['meta_query'] = $meta_query;
             }
 
             if ($tipo) {
@@ -66,6 +98,9 @@ get_header();
 
             <div class="filter-bar mb-4">
                 <form method="get" class="row g-3 align-items-end">
+                    <?php if ($selected_year) : ?>
+                        <input type="hidden" name="ano" value="<?php echo esc_attr($selected_year); ?>">
+                    <?php endif; ?>
                     <div class="col-md-4">
                         <label for="f-q" class="form-label"><?php _e('Pesquisa por nome', 'agert'); ?></label>
                         <input id="f-q" type="search" name="q" class="form-control" value="<?php echo esc_attr($search); ?>">
@@ -120,7 +155,7 @@ get_header();
             <?php endif; wp_reset_postdata(); ?>
         </div>
 
-        <div class="tab-pane fade" id="anexos-pane" role="tabpanel" aria-labelledby="anexos-tab">
+        <div class="tab-pane fade" id="documentos-pane" role="tabpanel" aria-labelledby="documentos-tab">
             <?php
             $attachments = new WP_Query(array(
                 'post_type'      => 'anexo',
@@ -134,6 +169,12 @@ get_header();
                 while ($attachments->have_posts()) : $attachments->the_post();
                     $reuniao_id = get_post_meta(get_the_ID(), '_reuniao_id', true);
                     $meeting    = $reuniao_id ? get_post($reuniao_id) : null;
+                    if ($selected_year && $meeting) {
+                        $m_date = agert_meta($meeting->ID, 'data_hora');
+                        if ($m_date && (int) date('Y', strtotime($m_date)) !== $selected_year) {
+                            continue;
+                        }
+                    }
                     $arquivo_id = (int) get_post_meta(get_the_ID(), '_arquivo_id', true);
                     $doc        = array(
                         'rotulo'      => get_the_title(),
@@ -162,6 +203,12 @@ get_header();
                 while ($videos_query->have_posts()) : $videos_query->the_post();
                     $meeting_id = get_post_meta(get_the_ID(), 'reuniao_relacionada', true);
                     $meeting    = $meeting_id ? get_post($meeting_id) : null;
+                    if ($selected_year && $meeting) {
+                        $m_date = agert_meta($meeting_id, 'data_hora');
+                        if ($m_date && (int) date('Y', strtotime($m_date)) !== $selected_year) {
+                            continue;
+                        }
+                    }
                     echo '<div class="col">';
                     get_template_part('parts/reunioes/card-video', null, array(
                         'meeting' => $meeting,
@@ -189,6 +236,21 @@ get_header();
             ?>
         </div>
 
+    </div>
+
+    <div class="row mt-5 g-4 info-bottom">
+        <div class="col-md-6">
+            <h5><?php _e('Informações sobre as Reuniões', 'agert'); ?></h5>
+            <h6 class="mt-3"><?php _e('Reuniões Ordinárias', 'agert'); ?></h6>
+            <p class="mb-1"><?php _e('As reuniões ordinárias da AGERT acontecem mensalmente, sempre na segunda terça-feira do mês, às 14h00.', 'agert'); ?></p>
+            <p class="mb-1"><?php _e('Sede da AGERT - Sala de Reuniões', 'agert'); ?></p>
+            <p class="mb-0"><?php _e('Rua Principal, 123 - Centro', 'agert'); ?></p>
+        </div>
+        <div class="col-md-6">
+            <h5><?php _e('Participação Pública', 'agert'); ?></h5>
+            <p class="mb-1"><?php _e('As reuniões são abertas ao público e transmitidas ao vivo pelo canal oficial da AGERT no YouTube.', 'agert'); ?></p>
+            <p class="mb-0"><?php _e('Para participar presencialmente, entre em contato conosco através dos canais oficiais com antecedência mínima de 48h.', 'agert'); ?></p>
+        </div>
     </div>
 </div>
 
