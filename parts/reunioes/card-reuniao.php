@@ -44,10 +44,8 @@ $data_hora = agert_meta($post_id, 'data_hora');
     </div>
     <div class="card-footer bg-white border-0 pt-0">
         <div class="d-flex justify-content-between small text-muted mb-2">
-            <span><?php echo esc_html($doc_qtd); ?> documentos</span>
-            <?php if ($video) : ?>
-                <span>Vídeo disponível</span>
-            <?php endif; ?>
+            <span><?php echo esc_html($doc_qtd); ?> <?php _e('documentos', 'agert'); ?></span>
+            <span><?php echo $video ? __('Vídeo disponível', 'agert') : __('Vídeo indisponível', 'agert'); ?></span>
         </div>
         <a href="<?php the_permalink(); ?>" class="btn btn-brand w-100">Ver Detalhes Completos</a>
     </div>
