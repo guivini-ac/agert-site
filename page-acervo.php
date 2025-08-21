@@ -10,8 +10,10 @@ get_header();
 
 <div class="container py-5 page-acervo">
     <?php agert_show_status_message(); ?>
-    <?php agert_back_button(); ?>
-    <?php agert_breadcrumb(); ?>
+    <div class="d-flex align-items-center mb-4">
+        <?php agert_back_button(); ?>
+        <?php agert_breadcrumb(); ?>
+    </div>
     <h1 class="mb-4"><?php _e('Acervo', 'agert'); ?></h1>
 
     <nav class="tabbar mb-4" aria-label="<?php esc_attr_e('Seções do acervo', 'agert'); ?>">

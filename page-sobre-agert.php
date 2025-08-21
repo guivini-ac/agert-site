@@ -43,8 +43,10 @@ if (have_posts()) :
         }
 ?>
 <div class="container py-5 page-sobre-agert">
-    <?php agert_back_button(); ?>
-    <?php agert_breadcrumb(); ?>
+    <div class="d-flex align-items-center mb-4">
+        <?php agert_back_button(); ?>
+        <?php agert_breadcrumb(); ?>
+    </div>
     <h1 class="mb-4 text-center"><?php the_title(); ?></h1>
 
     <?php if ($content) : ?>

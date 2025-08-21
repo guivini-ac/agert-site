@@ -48,8 +48,10 @@ $contact_map_url = get_option(
 ?>
 
 <div class="container py-5">
-    <?php agert_back_button(); ?>
-    <?php agert_breadcrumb(); ?>
+    <div class="d-flex align-items-center mb-4">
+        <?php agert_back_button(); ?>
+        <?php agert_breadcrumb(); ?>
+    </div>
     <h1 class="mb-4"><?php the_title(); ?></h1>
 
     <?php if ($success_message) : ?>

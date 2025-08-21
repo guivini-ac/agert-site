@@ -484,14 +484,15 @@ function agert_get_page_link($slug) {
  * Exibe um botão para voltar à página anterior.
  */
 function agert_back_button() {
-    echo '<div class="mb-3"><a href="' . esc_url(wp_get_referer() ?: home_url('/')) . '" class="btn btn-outline-brand btn-sm" aria-label="' . esc_attr__('Voltar', 'agert') . '" title="' . esc_attr__('Voltar', 'agert') . '"><i class="bi bi-arrow-left"></i> ' . esc_html__('Voltar', 'agert') . '</a></div>';
+    $url = esc_url(wp_get_referer() ?: home_url('/'));
+    echo '<a href="' . $url . '" onclick="history.back(); return false;" class="btn btn-outline-brand btn-sm me-3" aria-label="' . esc_attr__('Voltar', 'agert') . '" title="' . esc_attr__('Voltar', 'agert') . '"><i class="bi bi-arrow-left"></i> ' . esc_html__('Voltar', 'agert') . '</a>';
 }
 
 /**
  * Exibe breadcrumbs simples com a página atual.
  */
 function agert_breadcrumb() {
-    echo '<nav aria-label="breadcrumb"><ol class="breadcrumb mb-4">';
+    echo '<nav aria-label="breadcrumb"><ol class="breadcrumb mb-0">';
     echo '<li class="breadcrumb-item"><a href="' . esc_url(home_url('/')) . '">' . esc_html__('Home', 'agert') . '</a></li>';
     if (is_page()) {
         echo '<li class="breadcrumb-item active" aria-current="page">' . esc_html(get_the_title()) . '</li>';
