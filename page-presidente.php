@@ -38,8 +38,10 @@ if (have_posts()) :
         $has_details = $bio_breve || !empty($experiencias) || !empty($formacoes) || $mensagem || $assinatura_nome || $assinatura_cargo;
 ?>
 <div class="container-lg py-5">
-    <?php agert_back_button(); ?>
-    <?php agert_breadcrumb(); ?>
+    <div class="d-flex align-items-center mb-4">
+        <?php agert_back_button(); ?>
+        <?php agert_breadcrumb(); ?>
+    </div>
     <h1 class="text-center mb-5"><?php _e('Presidente', 'agert'); ?></h1>
     <div class="row g-4">
         <?php if ($has_profile) : ?>

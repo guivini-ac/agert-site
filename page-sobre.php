@@ -34,8 +34,10 @@ if (have_posts()) :
 
         <div class="page-sobre py-5">
             <div class="container-lg">
-                <?php agert_back_button(); ?>
-                <?php agert_breadcrumb(); ?>
+                <div class="d-flex align-items-center mb-4">
+                    <?php agert_back_button(); ?>
+                    <?php agert_breadcrumb(); ?>
+                </div>
                 <h1 class="text-center mb-4"><?php echo esc_html($titulo); ?></h1>
 
                 <?php if (!empty($texto)) : ?>
