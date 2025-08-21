@@ -15,19 +15,23 @@ if (!defined('ABSPATH')) {
 function agert_create_pages() {
     $pages = array(
         'acervo' => array(
-            'title'   => 'Acervo',
-            'content' => '<p>Consulte reuniões, anexos e vídeos.</p>',
+            'title'    => 'Acervo',
+            'content'  => '<p>Consulte reuniões, anexos e vídeos.</p>',
             'template' => 'page-acervo.php',
-
         ),
-        'sobre' => array(
-            'title'   => 'Sobre a AGERT',
-            'content' => '<p>Página institucional.</p>',
-            'template' => 'page-sobre.php',
+        'sobre-a-agert' => array(
+            'title'    => 'Sobre a AGERT',
+            'content'  => '<p>Página institucional.</p>',
+            'template' => 'page-sobre-agert.php',
+        ),
+        'presidente' => array(
+            'title'    => 'Presidente',
+            'content'  => '<p>Conheça o presidente da AGERT.</p>',
+            'template' => 'page-presidente.php',
         ),
         'contato' => array(
-            'title'   => 'Contato',
-            'content' => '<p>Fale conosco.</p>',
+            'title'    => 'Contato',
+            'content'  => '<p>Fale conosco.</p>',
             'template' => 'page-contato.php',
         ),
     );
@@ -74,7 +78,7 @@ function agert_create_menu() {
         ));
 
         // Pages
-        foreach (array('acervo', 'sobre', 'contato') as $slug) {
+        foreach (array('sobre-a-agert', 'presidente', 'acervo', 'contato') as $slug) {
             $page = get_page_by_path($slug);
             if ($page) {
                 wp_update_nav_menu_item($menu_id, 0, array(
