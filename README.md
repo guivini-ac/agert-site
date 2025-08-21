@@ -5,7 +5,7 @@ Tema WordPress responsivo para a Agência Reguladora de Serviços Públicos Dele
 ## Instalação Rápida
 1. Copie a pasta do tema para `wp-content/themes/agert`.
 2. No painel do WordPress, ative **AGERT - Tema Oficial**.
-3. Ao ativar, o tema cria automaticamente as páginas **Acervo** e **Participantes**, além do menu "Menu Principal".
+3. Ao ativar, o tema cria automaticamente as páginas **Acervo**, **Sobre a AGERT**, **Presidente** e **Contato**, além do menu "Menu Principal".
 
 Após a ativação você pode personalizar os links do menu em **Aparência > Menus**.
 Caso nenhum menu seja configurado, o tema exibirá um menu inicial com links para Home, Sobre a AGERT, Presidente, Acervo e Contato.

@@ -396,15 +396,19 @@ if (!function_exists('agert_menu_fallback')) {
                 'is_current' => is_front_page(),
             ],
             [
-                'url'        => agert_get_page_link('acervo'),
-                'label'      => __('Acervo', 'agert'),
-                'is_current' => is_page('acervo') || is_post_type_archive('reuniao') || is_singular('reuniao'),
-            ],
-            [
                 'url'        => agert_get_page_link('sobre-a-agert'),
                 'label'      => __('Sobre a AGERT', 'agert'),
                 'is_current' => is_page(['sobre-a-agert', 'sobre']),
-
+            ],
+            [
+                'url'        => agert_get_page_link('presidente'),
+                'label'      => __('Presidente', 'agert'),
+                'is_current' => is_page('presidente'),
+            ],
+            [
+                'url'        => agert_get_page_link('acervo'),
+                'label'      => __('Acervo', 'agert'),
+                'is_current' => is_page('acervo') || is_post_type_archive('reuniao') || is_singular('reuniao'),
             ],
             [
                 'url'        => agert_get_page_link('contato'),
