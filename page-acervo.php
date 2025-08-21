@@ -27,23 +27,6 @@ get_header();
         $selected_year = (int) $years[0];
     }
 
-    $meeting_ids_year = array();
-    if ($selected_year) {
-        $meeting_ids_year = get_posts(array(
-            'post_type'      => 'reuniao',
-            'post_status'    => 'publish',
-            'posts_per_page' => -1,
-            'fields'         => 'ids',
-            'meta_query'     => array(
-                array(
-                    'key'     => 'data_hora',
-                    'value'   => array($selected_year . '-01-01', $selected_year . '-12-31 23:59:59'),
-                    'compare' => 'BETWEEN',
-                    'type'    => 'DATETIME',
-                ),
-            ),
-        ));
-    }
     if ($years) :
     ?>
         <div class="d-flex justify-content-center gap-2 mb-4" aria-label="<?php esc_attr_e('Filtrar por ano', 'agert'); ?>">
@@ -180,20 +163,27 @@ get_header();
             $docs_paged = isset($_GET['docs_page']) ? max(1, (int) $_GET['docs_page']) : 1;
             $doc_search = isset($_GET['doc_q']) ? sanitize_text_field($_GET['doc_q']) : '';
             $doc_args   = array(
-                'post_type'      => 'anexo',
+                'post_type'      => 'attachment',
+                'post_status'    => 'inherit',
                 'posts_per_page' => 9,
                 'paged'          => $docs_paged,
-                'post_status'    => 'publish',
                 'orderby'        => 'date',
                 'order'          => 'DESC',
                 's'              => $doc_search,
+                'post_mime_type' => array(
+                    'application/pdf',
+                    'application/msword',
+                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    'application/vnd.ms-excel',
+                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                ),
             );
 
-            if (!empty($meeting_ids_year)) {
-                $doc_args['meta_query'][] = array(
-                    'key'     => '_reuniao_id',
-                    'value'   => $meeting_ids_year,
-                    'compare' => 'IN',
+            if ($selected_year) {
+                $doc_args['date_query'] = array(
+                    array(
+                        'year' => $selected_year,
+                    ),
                 );
             }
 
@@ -217,23 +207,28 @@ get_header();
             <?php
 
             if ($attachments->have_posts()) {
-                echo '<div class="document-list">';
+                echo '<div class="row row-cols-1 row-cols-md-3 g-4">';
                 while ($attachments->have_posts()) : $attachments->the_post();
-                    $reuniao_id = get_post_meta(get_the_ID(), '_reuniao_id', true);
-                    $meeting    = $reuniao_id ? get_post($reuniao_id) : null;
-                    if ($selected_year && $meeting) {
-                        $m_date = agert_meta($meeting->ID, 'data_hora');
-                        if ($m_date && (int) date('Y', strtotime($m_date)) !== $selected_year) {
-                            continue;
-                        }
+                    $file_url   = wp_get_attachment_url(get_the_ID());
+                    $file_path  = get_attached_file(get_the_ID());
+                    $file_size  = $file_path && file_exists($file_path) ? size_format(filesize($file_path)) : '';
+                    $thumb      = wp_get_attachment_image(get_the_ID(), 'thumbnail', true);
+                    $upload_date = get_the_date('d/m/Y');
+                    echo '<div class="col">';
+                    echo '<div class="documento-card">';
+                    if ($thumb) {
+                        echo '<div class="documento-icon">' . $thumb . '</div>';
+                    } else {
+                        echo '<div class="documento-icon">📄</div>';
                     }
-                    $arquivo_id = (int) get_post_meta(get_the_ID(), '_arquivo_id', true);
-                    $doc        = array(
-                        'rotulo'      => get_the_title(),
-                        'resumo'      => get_the_excerpt(),
-                        'arquivo_url' => $arquivo_id ? wp_get_attachment_url($arquivo_id) : '',
-                    );
-                    get_template_part('parts/reunioes/row-documento', null, array('doc' => $doc, 'meeting' => $meeting));
+                    echo '<div class="documento-info">';
+                    echo '<h3>' . esc_html(get_the_title()) . '</h3>';
+                    echo '<p>' . sprintf(__('Enviado em: %s', 'agert'), esc_html($upload_date)) . '</p>';
+                    if ($file_size) {
+                        echo '<p>' . sprintf(__('Tamanho: %s', 'agert'), esc_html($file_size)) . '</p>';
+                    }
+                    echo '<a href="' . esc_url($file_url) . '" class="btn-download btn btn-brand" download><i class="icon-download"></i> ' . __('Download PDF', 'agert') . '</a>';
+                    echo '</div></div></div>';
                 endwhile;
                 echo '</div>';
 
@@ -269,20 +264,28 @@ get_header();
             $videos_page  = isset($_GET['videos_page']) ? max(1, (int) $_GET['videos_page']) : 1;
             $video_search = isset($_GET['video_q']) ? sanitize_text_field($_GET['video_q']) : '';
             $video_args   = array(
-                'post_type'      => 'reuniao_video',
+                'post_type'      => 'reuniao',
                 'posts_per_page' => 9,
                 'paged'          => $videos_page,
                 'post_status'    => 'publish',
                 's'              => $video_search,
                 'orderby'        => 'date',
                 'order'          => 'DESC',
+                'meta_query'     => array(
+                    array(
+                        'key'     => 'url_video',
+                        'value'   => '',
+                        'compare' => '!=',
+                    ),
+                ),
             );
 
-            if (!empty($meeting_ids_year)) {
+            if ($selected_year) {
                 $video_args['meta_query'][] = array(
-                    'key'     => 'reuniao_relacionada',
-                    'value'   => $meeting_ids_year,
-                    'compare' => 'IN',
+                    'key'     => 'data_hora',
+                    'value'   => array($selected_year . '-01-01', $selected_year . '-12-31 23:59:59'),
+                    'compare' => 'BETWEEN',
+                    'type'    => 'DATETIME',
                 );
             }
 
@@ -308,32 +311,46 @@ get_header();
             if ($videos_query->have_posts()) {
                 echo '<div class="row row-cols-1 row-cols-md-3 g-4">';
                 while ($videos_query->have_posts()) : $videos_query->the_post();
-                    $meeting_id = get_post_meta(get_the_ID(), 'reuniao_relacionada', true);
-                    $meeting    = $meeting_id ? get_post($meeting_id) : null;
-                    if ($selected_year && $meeting) {
-                        $m_date = agert_meta($meeting_id, 'data_hora');
-                        if ($m_date && (int) date('Y', strtotime($m_date)) !== $selected_year) {
-                            continue;
+                    $video_url = get_post_meta(get_the_ID(), 'url_video', true);
+                    $duration  = (int) get_post_meta(get_the_ID(), 'duracao_segundos', true);
+                    $title     = get_the_title();
+                    $data_hora = agert_meta(get_the_ID(), 'data_hora');
+                    $thumb_url = '';
+                    $platform  = agert_detectar_plataforma_video($video_url);
+                    if ($platform === 'youtube') {
+                        $yt_id = agert_extrair_youtube_id($video_url);
+                        if ($yt_id) {
+                            $thumb_url = agert_thumbnail_youtube($yt_id);
                         }
+                    } elseif ($platform === 'vimeo') {
+                        $thumb_url = agert_thumbnail_vimeo($video_url);
+                    } else {
+                        $custom_thumb_id = get_post_meta(get_the_ID(), 'thumbnail_personalizada', true);
+                        if ($custom_thumb_id) {
+                            $thumb_url = wp_get_attachment_url($custom_thumb_id);
+                        }
+                    }
+                    if (!$thumb_url) {
+                        $thumb_url = get_the_post_thumbnail_url(get_the_ID(), 'large');
                     }
                     echo '<div class="col">';
-                    get_template_part('parts/reunioes/card-video', null, array(
-                        'meeting' => $meeting,
-                        'video'   => get_post(),
-                    ));
-                    echo '</div>';
-                    $videos = get_post_meta(get_the_ID(), 'videos', true);
-                    if (is_array($videos)) {
-                        foreach ($videos as $video) {
-                            echo '<div class="col">';
-                            get_template_part('parts/reunioes/card-video', null, array(
-                                'meeting' => get_post(),
-                                'video'   => $video,
-                            ));
-                            echo '</div>';
-                        }
+                    echo '<div class="video-card">';
+                    echo '<div class="video-thumbnail">';
+                    if ($thumb_url) {
+                        echo '<img src="' . esc_url($thumb_url) . '" alt="' . esc_attr($title) . '">';
                     }
-
+                    echo '<div class="play-overlay">▶️</div>';
+                    if ($duration) {
+                        echo '<span class="video-duration">' . esc_html(agert_seconds_to_mmss($duration)) . '</span>';
+                    }
+                    echo '</div>';
+                    echo '<div class="video-info">';
+                    echo '<h3>' . esc_html($title) . '</h3>';
+                    if ($data_hora) {
+                        echo '<p>' . esc_html(date_i18n('d/m/Y', strtotime($data_hora))) . '</p>';
+                    }
+                    echo '<a href="' . esc_url($video_url) . '" target="_blank" class="btn-assistir">' . __('Assistir Vídeo', 'agert') . '</a>';
+                    echo '</div></div></div>';
                 endwhile;
                 echo '</div>';
 
