@@ -51,6 +51,50 @@ function agert_bytes_to_human(int $bytes): string {
 }
 
 /**
+ * Detecta a plataforma de vídeo a partir da URL.
+ */
+function agert_detectar_plataforma_video(string $url): string {
+    if (strpos($url, 'youtube.com') !== false || strpos($url, 'youtu.be') !== false) {
+        return 'youtube';
+    }
+    if (strpos($url, 'vimeo.com') !== false) {
+        return 'vimeo';
+    }
+    return 'outro';
+}
+
+/**
+ * Extrai o ID de um vídeo do YouTube.
+ */
+function agert_extrair_youtube_id(string $url): string {
+    if (preg_match('/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/', $url, $matches)) {
+        return $matches[1];
+    }
+    return '';
+}
+
+/**
+ * Retorna a URL da thumbnail do YouTube.
+ */
+function agert_thumbnail_youtube(string $id): string {
+    return "https://img.youtube.com/vi/{$id}/maxresdefault.jpg";
+}
+
+/**
+ * Obtém a thumbnail do Vimeo via oEmbed.
+ */
+function agert_thumbnail_vimeo(string $url): string {
+    $response = wp_remote_get('https://vimeo.com/api/oembed.json?url=' . rawurlencode($url));
+    if (!is_wp_error($response)) {
+        $data = json_decode(wp_remote_retrieve_body($response));
+        if (!empty($data->thumbnail_url)) {
+            return $data->thumbnail_url;
+        }
+    }
+    return '';
+}
+
+/**
  * Retorna o ano de uma string datetime.
  */
 function agert_get_year_from_datetime(string $dt): int {
@@ -80,15 +124,8 @@ function agert_count_documentos(int $post_id): int {
  * Verifica se reunião possui vídeo.
  */
 function agert_reuniao_has_video(int $post_id): bool {
-    $videos = get_posts(array(
-        'post_type'      => 'reuniao_video',
-        'post_status'    => 'publish',
-        'meta_key'       => 'reuniao_relacionada',
-        'meta_value'     => $post_id,
-        'fields'         => 'ids',
-        'posts_per_page' => 1,
-    ));
-    return !empty($videos);
+    $url = get_post_meta($post_id, 'url_video', true);
+    return !empty($url);
 }
 
 /**
