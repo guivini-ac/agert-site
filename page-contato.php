@@ -106,7 +106,7 @@ $contact_map_url = get_option(
                     'icon'         => 'bi-geo-alt',
                     'label'        => __('Endereço', 'agert'),
                     'text'         => $contact_address,
-                    'wrap_classes' => 'col-12 col-md-8 mx-auto'
+                    'wrap_classes' => 'col-12'
                 )); ?>
             </div>
         </div>
