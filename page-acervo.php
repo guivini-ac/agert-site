@@ -250,10 +250,12 @@ get_header();
                     echo '</div>';
 
                     echo '<div class="d-flex gap-2 mt-3 mt-lg-0">';
-                    if ($meeting_link) {
+                    if (!empty($meeting_link)) {
                         echo '<a href="' . esc_url($meeting_link) . '" class="btn btn-outline-secondary btn-sm"><i class="bi bi-eye"></i> ' . __('Ver Reunião', 'agert') . '</a>';
                     }
-                    echo '<a href="' . esc_url($file_url) . '" class="btn btn-outline-secondary btn-sm" download><i class="bi bi-download"></i> ' . __('Download', 'agert') . '</a>';
+                    if (!empty($file_url)) {
+                        echo '<a href="' . esc_url($file_url) . '" class="btn btn-outline-secondary btn-sm" download><i class="bi bi-download"></i> ' . __('Download', 'agert') . '</a>';
+                    }
                     echo '</div>';
 
                     echo '</div>';
@@ -367,6 +369,7 @@ get_header();
                     $data_hora   = $reuniao_id ? agert_meta($reuniao_id, 'data_hora') : '';
                     $thumb_url   = '';
                     $platform    = agert_detectar_plataforma_video($video_url);
+
                     if ($platform === 'youtube') {
                         $yt_id = agert_extrair_youtube_id($video_url);
                         if ($yt_id) {
@@ -379,22 +382,16 @@ get_header();
                         if ($custom_thumb_id) {
                             $thumb_url = wp_get_attachment_url($custom_thumb_id);
                         }
-                        if (!$thumb_url) {
-                            $thumb_url = get_the_post_thumbnail_url($post_id, 'large'); // FIX: fallback único
-                        }
-                    if (!$thumb_url) {
+                    }
+                    // Fallback único e correto para a thumb do post atual
+                    if (empty($thumb_url)) {
                         $thumb_url = get_the_post_thumbnail_url(get_the_ID(), 'large');
                     }
-                    if (!$thumb_url) {
-                        $thumb_url = get_the_post_thumbnail_url(get_the_ID(), 'large');
-                    }
-                    if (!$thumb_url) {
-                        $thumb_url = get_the_post_thumbnail_url(get_the_ID(), 'large');
-                    }
+
                     echo '<div class="col">';
                     echo '<div class="video-card">';
                     echo '<div class="video-thumbnail">';
-                    if ($thumb_url) {
+                    if (!empty($thumb_url)) {
                         echo '<img src="' . esc_url($thumb_url) . '" alt="' . esc_attr($title) . '">';
                     }
                     echo '<div class="play-overlay">▶️</div>';
@@ -407,7 +404,9 @@ get_header();
                     if ($data_hora) {
                         echo '<p>' . esc_html(date_i18n('d/m/Y', strtotime($data_hora))) . '</p>';
                     }
-                    echo '<a href="' . esc_url($video_url) . '" target="_blank" class="btn-assistir">' . __('Assistir Vídeo', 'agert') . '</a>';
+                    if (!empty($video_url)) {
+                        echo '<a href="' . esc_url($video_url) . '" target="_blank" class="btn-assistir">' . __('Assistir Vídeo', 'agert') . '</a>';
+                    }
                     echo '</div></div></div>';
                 endwhile;
                 echo '</div>';
