@@ -132,6 +132,7 @@ function agert_reuniao_has_video(int $post_id): bool {
     ));
 
     return !empty($videos);
+
 }
 
 /**
