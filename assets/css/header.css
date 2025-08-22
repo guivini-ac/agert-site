@@ -1,3 +1,10 @@
+/* Cabeçalho flutuante */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 1020;
+}
+
 /* Barra */
 .site-header__bar {
   background:#060312; /* tom quase preto */

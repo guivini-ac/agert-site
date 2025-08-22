@@ -165,7 +165,7 @@ get_header();
             $doc_args   = array(
                 'post_type'      => 'anexo',
                 'post_status'    => 'publish',
-                'posts_per_page' => 9,
+                'posts_per_page' => 10,
                 'paged'          => $docs_paged,
                 'orderby'        => 'date',
                 'order'          => 'DESC',
@@ -295,7 +295,7 @@ get_header();
             $video_search = isset($_GET['video_q']) ? sanitize_text_field($_GET['video_q']) : '';
             $video_args   = array(
                 'post_type'      => 'reuniao',
-                'posts_per_page' => 9,
+                'posts_per_page' => 36,
                 'paged'          => $videos_page,
                 'post_status'    => 'publish',
                 's'              => $video_search,
@@ -360,7 +360,7 @@ get_header();
             <?php
 
             if ($videos_query->have_posts()) {
-                echo '<div class="row row-cols-1 row-cols-md-3 g-4">';
+                echo '<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-6 g-4">';
                 while ($videos_query->have_posts()) : $videos_query->the_post();
                     $video_url   = get_post_meta(get_the_ID(), 'video_url', true);
                     $duration    = (int) get_post_meta(get_the_ID(), 'duracao_segundos', true);
