@@ -5,6 +5,7 @@ body.post-type-archive-reuniao {
 
 .page-acervo {
     background: var(--bg);
+    border-radius: var(--agert-radius-lg);
 }
 
 .pills-ano .btn {
@@ -13,9 +14,6 @@ body.post-type-archive-reuniao {
 }
 
 .filter-bar {
-    position:sticky;
-    top:80px;
-    z-index:10;
     background:var(--white);
     border:1px solid var(--line);
     border-radius:14px;
@@ -85,9 +83,7 @@ body.post-type-archive-reuniao {
     gap:1rem;
 }
 
-@media (max-width: 768px){
-    .filter-bar { top:70px; }
-}
+
 
 .doc-row {
     display: flex;
