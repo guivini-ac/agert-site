@@ -22,16 +22,21 @@ get_header();
     // Filtro por ano
     global $wpdb;
     $selected_year = isset($_GET['ano']) ? (int) $_GET['ano'] : 0;
-    $years = $wpdb->get_col("SELECT DISTINCT YEAR(meta_value) FROM {$wpdb->postmeta} pm INNER JOIN {$wpdb->posts} p ON pm.post_id = p.ID WHERE pm.meta_key = 'data_hora' AND p.post_type = 'reuniao' AND p.post_status = 'publish' ORDER BY meta_value DESC");
+    $years         = $wpdb->get_col("SELECT DISTINCT YEAR(meta_value) FROM {$wpdb->postmeta} pm INNER JOIN {$wpdb->posts} p ON pm.post_id = p.ID WHERE pm.meta_key = 'data_hora' AND p.post_type = 'reuniao' AND p.post_status = 'publish' ORDER BY meta_value DESC");
     if (!$selected_year && !empty($years)) {
         $selected_year = (int) $years[0];
+    }
+
+    $active_tab = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : 'reunioes';
+    if (!in_array($active_tab, array('reunioes', 'documentos', 'videos'), true)) {
+        $active_tab = 'reunioes';
     }
 
     if ($years) :
     ?>
         <div class="d-flex justify-content-center gap-2 mb-4" aria-label="<?php esc_attr_e('Filtrar por ano', 'agert'); ?>">
             <?php foreach ($years as $year) :
-                $link = add_query_arg('ano', $year);
+                $link    = add_query_arg(array('ano' => $year, 'tab' => $active_tab));
                 $classes = 'btn btn-sm ' . ($selected_year === (int) $year ? 'btn-dark text-white' : 'btn-outline-dark');
             ?>
                 <a href="<?php echo esc_url($link); ?>" class="<?php echo esc_attr($classes); ?>"><?php echo esc_html($year); ?></a>
@@ -41,15 +46,15 @@ get_header();
 
     <nav class="tabbar mb-4" aria-label="<?php esc_attr_e('Seções do acervo', 'agert'); ?>">
         <div class="nav nav-tabs" id="acervoTabs" role="tablist">
-            <button class="nav-link active" id="reunioes-tab" data-bs-toggle="tab" data-bs-target="#reunioes-pane" type="button" role="tab" aria-controls="reunioes-pane" aria-selected="true"><?php _e('Reuniões', 'agert'); ?></button>
-            <button class="nav-link" id="documentos-tab" data-bs-toggle="tab" data-bs-target="#documentos-pane" type="button" role="tab" aria-controls="documentos-pane" aria-selected="false"><?php _e('Documentos', 'agert'); ?></button>
-            <button class="nav-link" id="videos-tab" data-bs-toggle="tab" data-bs-target="#videos-pane" type="button" role="tab" aria-controls="videos-pane" aria-selected="false"><?php _e('Vídeos', 'agert'); ?></button>
+            <button class="nav-link <?php echo $active_tab === 'reunioes' ? 'active' : ''; ?>" id="reunioes-tab" data-bs-toggle="tab" data-bs-target="#reunioes-pane" type="button" role="tab" aria-controls="reunioes-pane" aria-selected="<?php echo $active_tab === 'reunioes' ? 'true' : 'false'; ?>"><?php _e('Reuniões', 'agert'); ?></button>
+            <button class="nav-link <?php echo $active_tab === 'documentos' ? 'active' : ''; ?>" id="documentos-tab" data-bs-toggle="tab" data-bs-target="#documentos-pane" type="button" role="tab" aria-controls="documentos-pane" aria-selected="<?php echo $active_tab === 'documentos' ? 'true' : 'false'; ?>"><?php _e('Documentos', 'agert'); ?></button>
+            <button class="nav-link <?php echo $active_tab === 'videos' ? 'active' : ''; ?>" id="videos-tab" data-bs-toggle="tab" data-bs-target="#videos-pane" type="button" role="tab" aria-controls="videos-pane" aria-selected="<?php echo $active_tab === 'videos' ? 'true' : 'false'; ?>"><?php _e('Vídeos', 'agert'); ?></button>
         </div>
     </nav>
 
     <div class="tab-content" id="acervoTabsContent">
 
-        <div class="tab-pane fade show active" id="reunioes-pane" role="tabpanel" aria-labelledby="reunioes-tab">
+        <div class="tab-pane fade <?php echo $active_tab === 'reunioes' ? 'show active' : ''; ?>" id="reunioes-pane" role="tabpanel" aria-labelledby="reunioes-tab">
             <?php
 
             $paged  = get_query_var('paged') ? get_query_var('paged') : 1;
@@ -104,6 +109,7 @@ get_header();
                     <?php if ($selected_year) : ?>
                         <input type="hidden" name="ano" value="<?php echo esc_attr($selected_year); ?>">
                     <?php endif; ?>
+                    <input type="hidden" name="tab" value="reunioes">
                     <div class="col-md-4">
                         <label for="f-q" class="form-label"><?php _e('Pesquisa por nome', 'agert'); ?></label>
                         <input id="f-q" type="search" name="q" class="form-control" value="<?php echo esc_attr($search); ?>">
@@ -140,8 +146,10 @@ get_header();
                 <?php if ($meetings->max_num_pages > 1) : ?>
                     <div class="mt-4">
                         <?php
+                        $base = add_query_arg('tab', 'reunioes', get_pagenum_link(999999999));
+                        $base = str_replace(999999999, '%#%', esc_url($base));
                         echo paginate_links(array(
-                            'base'      => str_replace(999999999, '%#%', esc_url(get_pagenum_link(999999999))),
+                            'base'      => $base,
                             'format'    => '?paged=%#%',
                             'current'   => max(1, $paged),
                             'total'     => $meetings->max_num_pages,
@@ -158,7 +166,7 @@ get_header();
             <?php endif; wp_reset_postdata(); ?>
         </div>
 
-        <div class="tab-pane fade" id="documentos-pane" role="tabpanel" aria-labelledby="documentos-tab">
+        <div class="tab-pane fade <?php echo $active_tab === 'documentos' ? 'show active' : ''; ?>" id="documentos-pane" role="tabpanel" aria-labelledby="documentos-tab">
             <?php
             $docs_paged = isset($_GET['docs_page']) ? max(1, (int) $_GET['docs_page']) : 1;
             $doc_search = isset($_GET['doc_q']) ? sanitize_text_field($_GET['doc_q']) : '';
@@ -199,6 +207,7 @@ get_header();
                     <?php if ($selected_year) : ?>
                         <input type="hidden" name="ano" value="<?php echo esc_attr($selected_year); ?>">
                     <?php endif; ?>
+                    <input type="hidden" name="tab" value="documentos">
                     <div class="col-md-10">
                         <label for="doc-q" class="form-label"><?php _e('Pesquisa por nome', 'agert'); ?></label>
                         <input id="doc-q" type="search" name="doc_q" class="form-control" value="<?php echo esc_attr($doc_search); ?>">
@@ -265,6 +274,7 @@ get_header();
                 if ($attachments->max_num_pages > 1) {
                     $base_args = array(
                         'docs_page' => '%#%',
+                        'tab'       => 'documentos',
                     );
                     if ($doc_search) {
                         $base_args['doc_q'] = $doc_search;
@@ -289,7 +299,7 @@ get_header();
             ?>
         </div>
 
-        <div class="tab-pane fade" id="videos-pane" role="tabpanel" aria-labelledby="videos-tab">
+        <div class="tab-pane fade <?php echo $active_tab === 'videos' ? 'show active' : ''; ?>" id="videos-pane" role="tabpanel" aria-labelledby="videos-tab">
             <?php
             $videos_page  = isset($_GET['videos_page']) ? max(1, (int) $_GET['videos_page']) : 1;
             $video_search = isset($_GET['video_q']) ? sanitize_text_field($_GET['video_q']) : '';
@@ -348,6 +358,7 @@ get_header();
                     <?php if ($selected_year) : ?>
                         <input type="hidden" name="ano" value="<?php echo esc_attr($selected_year); ?>">
                     <?php endif; ?>
+                    <input type="hidden" name="tab" value="videos">
                     <div class="col-md-10">
                         <label for="video-q" class="form-label"><?php _e('Pesquisa por nome', 'agert'); ?></label>
                         <input id="video-q" type="search" name="video_q" class="form-control" value="<?php echo esc_attr($video_search); ?>">
@@ -375,6 +386,7 @@ get_header();
                 if ($videos_query->max_num_pages > 1) {
                     $base_args = array(
                         'videos_page' => '%#%',
+                        'tab'         => 'videos',
                     );
                     if ($video_search) {
                         $base_args['video_q'] = $video_search;
@@ -418,5 +430,36 @@ get_header();
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var tabs = document.querySelectorAll('#acervoTabs button[data-bs-toggle="tab"]');
+    var yearLinks = document.querySelectorAll('.d-flex.justify-content-center.gap-2 a');
+
+    function updateYearLinks(tab) {
+        yearLinks.forEach(function (link) {
+            var url = new URL(link.href);
+            url.searchParams.set('tab', tab);
+            link.href = url.toString();
+        });
+    }
+
+    var currentTab = new URL(window.location).searchParams.get('tab') || 'reunioes';
+    updateYearLinks(currentTab);
+
+    tabs.forEach(function (btn) {
+        btn.addEventListener('shown.bs.tab', function (event) {
+            var id = event.target.getAttribute('id');
+            var tab = id ? id.replace('-tab', '') : '';
+            if (tab) {
+                var url = new URL(window.location);
+                url.searchParams.set('tab', tab);
+                window.history.replaceState(null, '', url);
+                updateYearLinks(tab);
+            }
+        });
+    });
+});
+</script>
 
 <?php get_footer(); ?>
