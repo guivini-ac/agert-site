@@ -371,27 +371,22 @@ get_header();
                     $thumb_url   = '';
                     $platform    = agert_detectar_plataforma_video($video_url);
 
-                    if ($platform === 'youtube') {
-                        $yt_id = agert_extrair_youtube_id($video_url);
-                        if ($yt_id) {
-                            $thumb_url = agert_thumbnail_youtube($yt_id);
+                        if ($platform === 'youtube') {
+                            $yt_id = agert_extrair_youtube_id($video_url);
+                            if ($yt_id) {
+                                $thumb_url = agert_thumbnail_youtube($yt_id);
+                            }
+                        } elseif ($platform === 'vimeo') {
+                            $thumb_url = agert_thumbnail_vimeo($video_url);
+                        } else {
+                            $custom_thumb_id = (int) get_post_meta($post_id, 'thumbnail_personalizada', true);
+                            if ($custom_thumb_id) {
+                                $thumb_url = wp_get_attachment_url($custom_thumb_id);
+                            }
                         }
-                    } elseif ($platform === 'vimeo') {
-                        $thumb_url = agert_thumbnail_vimeo($video_url);
-                    } else {
-                        $custom_thumb_id = get_post_meta(get_the_ID(), 'thumbnail_personalizada', true);
-                        if ($custom_thumb_id) {
-                            $thumb_url = wp_get_attachment_url($custom_thumb_id);
-
+                        if (!$thumb_url) {
+                            $thumb_url = get_the_post_thumbnail_url($post_id, 'large'); // FIX: fallback único
                         }
-                    } elseif ($platform === 'vimeo') {
-                        $thumb_url = agert_thumbnail_vimeo($video_url);
-                    } else {
-                        $custom_thumb_id = get_post_meta(get_the_ID(), 'thumbnail_personalizada', true);
-                        if ($custom_thumb_id) {
-                            $thumb_url = wp_get_attachment_url($custom_thumb_id);
-                        }
-                    }
                     if (!$thumb_url) {
                         $thumb_url = get_the_post_thumbnail_url(get_the_ID(), 'large');
                     }
@@ -447,21 +442,6 @@ get_header();
         </div>
 
     </div>
-
-    <div class="row mt-5 g-4 info-bottom">
-        <div class="col-md-6">
-            <h5><?php _e('Informações sobre as Reuniões', 'agert'); ?></h5>
-            <h6 class="mt-3"><?php _e('Reuniões Ordinárias', 'agert'); ?></h6>
-            <p class="mb-1"><?php _e('As reuniões ordinárias da AGERT acontecem mensalmente, sempre na segunda terça-feira do mês, às 14h00.', 'agert'); ?></p>
-            <p class="mb-1"><?php _e('Sede da AGERT - Sala de Reuniões', 'agert'); ?></p>
-            <p class="mb-0"><?php _e('Rua Principal, 123 - Centro', 'agert'); ?></p>
-        </div>
-        <div class="col-md-6">
-            <h5><?php _e('Participação Pública', 'agert'); ?></h5>
-            <p class="mb-1"><?php _e('As reuniões são abertas ao público e transmitidas ao vivo pelo canal oficial da AGERT no YouTube.', 'agert'); ?></p>
-            <p class="mb-0"><?php _e('Para participar presencialmente, entre em contato conosco através dos canais oficiais com antecedência mínima de 48h.', 'agert'); ?></p>
-        </div>
-    </div>
 </div>
 
 <div class="container py-5">
@@ -482,4 +462,3 @@ get_header();
 </div>
 
 <?php get_footer(); ?>
-
