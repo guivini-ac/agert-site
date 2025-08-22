@@ -170,12 +170,18 @@ get_header();
                 'orderby'        => 'date',
                 'order'          => 'DESC',
                 's'              => $doc_search,
-
                 'meta_query'     => array(
+                    'relation' => 'AND',
+
                     array(
                         'key'     => '_arquivo_id',
                         'compare' => 'EXISTS',
                     ),
+                    array(
+                        'key'     => '_reuniao_id',
+                        'compare' => 'EXISTS',
+                    ),
+
                 ),
             );
 
@@ -207,31 +213,53 @@ get_header();
             <?php
 
             if ($attachments->have_posts()) {
-                echo '<div class="row row-cols-1 row-cols-md-3 g-4">';
+                echo '<div class="documento-list">';
                 while ($attachments->have_posts()) : $attachments->the_post();
                     $arquivo_id  = (int) get_post_meta(get_the_ID(), '_arquivo_id', true);
+                    $reuniao_id  = (int) get_post_meta(get_the_ID(), '_reuniao_id', true);
                     if (!$arquivo_id) { continue; }
+
                     $file_url   = wp_get_attachment_url($arquivo_id);
                     $file_path  = get_attached_file($arquivo_id);
                     $file_size  = ($file_path && file_exists($file_path)) ? size_format(filesize($file_path)) : '';
-                    $thumb      = wp_get_attachment_image($arquivo_id, 'thumbnail', true);
+                    $doc_title  = get_the_title();
+                    $doc_type   = strtok($doc_title, ' ');
+                    $excerpt    = get_the_excerpt();
 
-                    $upload_date = get_the_date('d/m/Y');
-                    echo '<div class="col">';
-                    echo '<div class="documento-card">';
-                    if ($thumb) {
-                        echo '<div class="documento-icon">' . $thumb . '</div>';
-                    } else {
-                        echo '<div class="documento-icon">📄</div>';
+                    $meeting_link = $reuniao_id ? get_permalink($reuniao_id) : '';
+                    $meeting_dt   = $reuniao_id ? agert_meta($reuniao_id, 'data_hora', '') : '';
+                    $meeting_date = $meeting_dt ? date_i18n('d/m/Y', strtotime($meeting_dt)) : '';
+
+                    echo '<div class="documento-item d-flex flex-column flex-lg-row align-items-lg-center justify-content-between border rounded p-3 mb-3">';
+
+                    echo '<div class="flex-grow-1 me-lg-3">';
+                    echo '<div class="d-flex align-items-center gap-2 mb-1">';
+                    if ($doc_type) {
+                        echo '<span class="badge bg-light text-dark">' . esc_html($doc_type) . '</span>';
                     }
-                    echo '<div class="documento-info">';
-                    echo '<h3>' . esc_html(get_the_title()) . '</h3>';
-                    echo '<p>' . sprintf(__('Enviado em: %s', 'agert'), esc_html($upload_date)) . '</p>';
+                    echo '<i class="bi bi-file-earmark-pdf text-danger"></i>';
+                    if ($meeting_date) {
+                        echo '<span class="text-muted"><i class="bi bi-calendar3 me-1"></i>' . esc_html($meeting_date) . '</span>';
+                    }
+                    echo '</div>';
+                    echo '<h3 class="h6 mb-1">' . esc_html($doc_title) . '</h3>';
+                    if ($excerpt) {
+                        echo '<p class="mb-2 text-muted">' . esc_html($excerpt) . '</p>';
+                    }
                     if ($file_size) {
-                        echo '<p>' . sprintf(__('Tamanho: %s', 'agert'), esc_html($file_size)) . '</p>';
+                        echo '<small class="text-muted">' . sprintf(__('Tamanho: %s', 'agert'), esc_html($file_size)) . '</small>';
                     }
-                    echo '<a href="' . esc_url($file_url) . '" class="btn-download btn btn-brand" download><i class="icon-download"></i> ' . __('Download', 'agert') . '</a>';
-                    echo '</div></div></div>';
+                    echo '</div>';
+
+                    echo '<div class="d-flex gap-2 mt-3 mt-lg-0">';
+                    if ($meeting_link) {
+                        echo '<a href="' . esc_url($meeting_link) . '" class="btn btn-outline-secondary btn-sm"><i class="bi bi-eye"></i> ' . __('Ver Reunião', 'agert') . '</a>';
+                    }
+                    echo '<a href="' . esc_url($file_url) . '" class="btn btn-outline-secondary btn-sm" download><i class="bi bi-download"></i> ' . __('Download', 'agert') . '</a>';
+                    echo '</div>';
+
+                    echo '</div>';
+
                 endwhile;
                 echo '</div>';
 
@@ -313,7 +341,6 @@ get_header();
                         'compare' => '=',
                     );
                 }
-
             }
 
             $videos_query = new WP_Query($video_args);
