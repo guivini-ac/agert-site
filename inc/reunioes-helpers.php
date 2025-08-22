@@ -9,7 +9,6 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-
 /**
  * Converte minutos em formato "3h 15min".
  */
@@ -125,7 +124,7 @@ function agert_count_documentos(int $post_id): int {
 }
 
 /**
- * Verifica se reunião possui vídeo.
+ * Verifica se reunião possui vídeo (CPT reuniao_video relacionado).
  */
 function agert_reuniao_has_video(int $post_id): bool {
     $videos = get_posts(array(
@@ -136,9 +135,7 @@ function agert_reuniao_has_video(int $post_id): bool {
         'fields'         => 'ids',
         'posts_per_page' => 1,
     ));
-
     return !empty($videos);
-
 }
 
 /**
@@ -147,6 +144,7 @@ function agert_reuniao_has_video(int $post_id): bool {
  * @param int $post_id ID da reunião.
  * @return array{url:string, duration:int, thumb:string}|array
  */
+if (!function_exists('agert_get_reuniao_video_data')) {
 function agert_get_reuniao_video_data(int $post_id): array {
     $videos = get_posts(array(
         'post_type'      => 'reuniao_video',
@@ -190,55 +188,6 @@ function agert_get_reuniao_video_data(int $post_id): array {
         'thumb'    => $thumb,
     );
 }
-
-/**
- * Obtém dados do primeiro vídeo associado à reunião.
- *
- * @param int $post_id ID da reunião.
- * @return array{url:string, duration:int, thumb:string}|array
- */
-function agert_get_reuniao_video_data(int $post_id): array {
-    $videos = get_posts(array(
-        'post_type'      => 'reuniao_video',
-        'post_status'    => 'publish',
-        'meta_key'       => 'reuniao_relacionada',
-        'meta_value'     => $post_id,
-        'posts_per_page' => 1,
-    ));
-
-    if (empty($videos)) {
-        return array();
-    }
-
-    $video    = $videos[0];
-    $url      = get_post_meta($video->ID, 'video_url', true);
-    $duration = (int) get_post_meta($video->ID, 'duracao_segundos', true);
-    $thumb    = '';
-
-    $platform = agert_detectar_plataforma_video($url);
-    if ($platform === 'youtube') {
-        $yt = agert_extrair_youtube_id($url);
-        if ($yt) {
-            $thumb = agert_thumbnail_youtube($yt);
-        }
-    } elseif ($platform === 'vimeo') {
-        $thumb = agert_thumbnail_vimeo($url);
-    } else {
-        $custom_thumb_id = get_post_meta($video->ID, 'thumbnail_personalizada', true);
-        if ($custom_thumb_id) {
-            $thumb = wp_get_attachment_url($custom_thumb_id);
-        }
-    }
-
-    if (!$thumb) {
-        $thumb = get_the_post_thumbnail_url($video->ID, 'large');
-    }
-
-    return array(
-        'url'      => $url,
-        'duration' => $duration,
-        'thumb'    => $thumb,
-    );
 }
 
 /**
@@ -256,12 +205,12 @@ function agert_reuniao_has_docs(int $post_id): bool {
 function agert_available_years(): array {
     $years = array();
     $q = new WP_Query(array(
-        'post_type' => 'reuniao',
-        'post_status' => 'publish',
+        'post_type'      => 'reuniao',
+        'post_status'    => 'publish',
         'posts_per_page' => -1,
-        'fields' => 'ids'
+        'fields'         => 'ids'
     ));
-    
+
     foreach ($q->posts as $pid) {
         $dt = agert_meta($pid, 'data_hora', '');
         if ($dt) {
@@ -271,14 +220,14 @@ function agert_available_years(): array {
         }
         $years[$y] = true;
     }
-    
+
     $keys = array_keys($years);
     rsort($keys);
-    
+
     if (empty($keys)) {
         $keys[] = (int) date('Y');
     }
-    
+
     return $keys;
 }
 
@@ -305,40 +254,40 @@ function agert_active_year(): int {
  */
 function agert_query_reunioes_filtradas(array $p): WP_Query {
     $ano = (int) ($p['ano'] ?? agert_active_year());
-    $de = $p['de'] ?? sprintf('%d-01-01 00:00:00', $ano);
+    $de  = $p['de']  ?? sprintf('%d-01-01 00:00:00', $ano);
     $ate = $p['ate'] ?? sprintf('%d-12-31 23:59:59', $ano);
-    
+
     $meta_query = array('relation' => 'AND');
-    
+
     // data_hora OU post_date (fallback)
     $meta_query[] = array(
         'relation' => 'OR',
         array(
-            'key' => 'data_hora',
-            'value' => array($de, $ate),
-            'type' => 'DATETIME',
+            'key'     => 'data_hora',
+            'value'   => array($de, $ate),
+            'type'    => 'DATETIME',
             'compare' => 'BETWEEN'
         ),
         array(
-            'key' => 'data_hora',
+            'key'     => 'data_hora',
             'compare' => 'NOT EXISTS'
         )
     );
-    
+
     if (!empty($p['status'])) {
         if ($p['status'] === 'video') {
             $meta_query[] = array('key' => 'videos', 'compare' => 'EXISTS');
         }
     }
-    
+
     if (!empty($p['local'])) {
         $meta_query[] = array(
-            'key' => 'local',
-            'value' => $p['local'],
+            'key'     => 'local',
+            'value'   => $p['local'],
             'compare' => 'LIKE'
         );
     }
-    
+
     $args = array(
         'post_type'      => 'reuniao',
         'post_status'    => 'publish',
@@ -347,7 +296,7 @@ function agert_query_reunioes_filtradas(array $p): WP_Query {
         's'              => $p['q'] ?? '',
         'meta_query'     => $meta_query,
     );
-    
+
     // tipo: tax ou meta
     if (!empty($p['tipo'])) {
         if (taxonomy_exists('tipo_reuniao')) {
@@ -358,33 +307,33 @@ function agert_query_reunioes_filtradas(array $p): WP_Query {
             ));
         } else {
             $meta_query[] = array(
-                'key'   => 'tipo_reuniao',
-                'value' => $p['tipo'],
+                'key'     => 'tipo_reuniao',
+                'value'   => $p['tipo'],
                 'compare' => 'LIKE'
             );
             $args['meta_query'] = $meta_query;
         }
     }
-    
+
     // ordenação
     $ordem = $p['ordem'] ?? 'data_desc';
     if ($ordem === 'data_asc' || $ordem === 'data_desc') {
-        $args['meta_key'] = 'data_hora';
-        $args['orderby'] = 'meta_value';
+        $args['meta_key']  = 'data_hora';
+        $args['orderby']   = 'meta_value';
         $args['meta_type'] = 'DATETIME';
-        $args['order'] = ($ordem === 'data_asc') ? 'ASC' : 'DESC';
+        $args['order']     = ($ordem === 'data_asc') ? 'ASC' : 'DESC';
     } elseif ($ordem === 'titulo_za') {
         $args['orderby'] = 'title';
-        $args['order'] = 'DESC';
+        $args['order']   = 'DESC';
     } else {
         $args['orderby'] = 'title';
-        $args['order'] = 'ASC';
+        $args['order']   = 'ASC';
     }
-    
+
     if (!empty($p['fields'])) {
         $args['fields'] = $p['fields'];
     }
-    
+
     return new WP_Query($args);
 }
 
@@ -412,16 +361,16 @@ function agert_coletar_documentos(array $p): array {
         ));
 
         foreach ($docs as $d_post) {
-            $aid = (int) get_post_meta($d_post->ID, '_arquivo_id', true);
+            $aid       = (int) get_post_meta($d_post->ID, '_arquivo_id', true);
             $file_path = $aid ? get_attached_file($aid) : '';
             $file_size = ($file_path && file_exists($file_path)) ? filesize($file_path) : 0;
             $items[] = array(
                 'doc' => array(
-                    'rotulo'       => get_the_title($d_post),
-                    'arquivo_id'   => $aid,
-                    'arquivo_url'  => $aid ? wp_get_attachment_url($aid) : '',
-                    'tamanho_bytes'=> $file_size,
-                    'resumo'       => get_the_excerpt($d_post)
+                    'rotulo'         => get_the_title($d_post),
+                    'arquivo_id'     => $aid,
+                    'arquivo_url'    => $aid ? wp_get_attachment_url($aid) : '',
+                    'tamanho_bytes'  => $file_size,
+                    'resumo'         => get_the_excerpt($d_post)
                 ),
                 'meeting' => get_post($pid)
             );
@@ -448,18 +397,18 @@ function agert_coletar_documentos(array $p): array {
  */
 function agert_seed_demo_if_empty() {
     $existing = get_posts(array(
-        'post_type' => 'reuniao',
+        'post_type'      => 'reuniao',
         'posts_per_page' => 1,
-        'post_status' => 'any',
+        'post_status'    => 'any',
     ));
     if ($existing) {
         return;
     }
 
     $post_id = wp_insert_post(array(
-        'post_type' => 'reuniao',
-        'post_status' => 'publish',
-        'post_title' => 'Reunião de Demonstração',
+        'post_type'    => 'reuniao',
+        'post_status'  => 'publish',
+        'post_title'   => 'Reunião de Demonstração',
         'post_content' => 'Conteúdo de exemplo da reunião.',
     ));
     if (!$post_id) {
@@ -480,7 +429,7 @@ function agert_seed_demo_if_empty() {
     for ($i = 1; $i <= 2; $i++) {
         $bits = wp_upload_bits("documento-demo-$i.txt", null, "Documento de exemplo $i");
         if (empty($bits['error'])) {
-            $filetype = wp_check_filetype($bits['file']);
+            $filetype  = wp_check_filetype($bits['file']);
             $attach_id = wp_insert_attachment(array(
                 'post_mime_type' => $filetype['type'],
                 'post_title'     => "Documento $i",
@@ -488,8 +437,8 @@ function agert_seed_demo_if_empty() {
             ), $bits['file']);
             if (!is_wp_error($attach_id)) {
                 $docs[] = array(
-                    'rotulo' => "Documento $i",
-                    'arquivo_id' => $attach_id,
+                    'rotulo'        => "Documento $i",
+                    'arquivo_id'    => $attach_id,
                     'tamanho_bytes' => file_exists($bits['file']) ? filesize($bits['file']) : 0,
                 );
             }
