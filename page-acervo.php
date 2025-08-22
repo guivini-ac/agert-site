@@ -294,7 +294,7 @@ get_header();
             $videos_page  = isset($_GET['videos_page']) ? max(1, (int) $_GET['videos_page']) : 1;
             $video_search = isset($_GET['video_q']) ? sanitize_text_field($_GET['video_q']) : '';
             $video_args   = array(
-                'post_type'      => 'reuniao',
+                'post_type'      => 'reuniao_video',
                 'posts_per_page' => 9,
                 'paged'          => $videos_page,
                 'post_status'    => 'publish',
