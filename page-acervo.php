@@ -181,7 +181,6 @@ get_header();
                         'key'     => '_reuniao_id',
                         'compare' => 'EXISTS',
                     ),
-
                 ),
             );
 
@@ -259,7 +258,6 @@ get_header();
                     echo '</div>';
 
                     echo '</div>';
-
                 endwhile;
                 echo '</div>';
 
@@ -384,7 +382,18 @@ get_header();
                         $custom_thumb_id = get_post_meta(get_the_ID(), 'thumbnail_personalizada', true);
                         if ($custom_thumb_id) {
                             $thumb_url = wp_get_attachment_url($custom_thumb_id);
+
                         }
+                    } elseif ($platform === 'vimeo') {
+                        $thumb_url = agert_thumbnail_vimeo($video_url);
+                    } else {
+                        $custom_thumb_id = get_post_meta(get_the_ID(), 'thumbnail_personalizada', true);
+                        if ($custom_thumb_id) {
+                            $thumb_url = wp_get_attachment_url($custom_thumb_id);
+                        }
+                    }
+                    if (!$thumb_url) {
+                        $thumb_url = get_the_post_thumbnail_url(get_the_ID(), 'large');
                     }
                     if (!$thumb_url) {
                         $thumb_url = get_the_post_thumbnail_url(get_the_ID(), 'large');
