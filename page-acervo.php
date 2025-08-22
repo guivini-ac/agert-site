@@ -165,7 +165,7 @@ get_header();
             $doc_args   = array(
                 'post_type'      => 'anexo',
                 'post_status'    => 'publish',
-                'posts_per_page' => 9,
+                'posts_per_page' => 10,
                 'paged'          => $docs_paged,
                 'orderby'        => 'date',
                 'order'          => 'DESC',
