@@ -362,52 +362,13 @@ get_header();
             if ($videos_query->have_posts()) {
                 echo '<div class="row row-cols-1 row-cols-md-3 g-4">';
                 while ($videos_query->have_posts()) : $videos_query->the_post();
-                    $video_url   = get_post_meta(get_the_ID(), 'video_url', true);
-                    $duration    = (int) get_post_meta(get_the_ID(), 'duracao_segundos', true);
-                    $reuniao_id  = (int) get_post_meta(get_the_ID(), 'reuniao_relacionada', true);
-                    $title       = $reuniao_id ? get_the_title($reuniao_id) : get_the_title();
-                    $data_hora   = $reuniao_id ? agert_meta($reuniao_id, 'data_hora') : '';
-                    $thumb_url   = '';
-                    $platform    = agert_detectar_plataforma_video($video_url);
-
-                    if ($platform === 'youtube') {
-                        $yt_id = agert_extrair_youtube_id($video_url);
-                        if ($yt_id) {
-                            $thumb_url = agert_thumbnail_youtube($yt_id);
-                        }
-                    } elseif ($platform === 'vimeo') {
-                        $thumb_url = agert_thumbnail_vimeo($video_url);
-                    } else {
-                        $custom_thumb_id = get_post_meta(get_the_ID(), 'thumbnail_personalizada', true);
-                        if ($custom_thumb_id) {
-                            $thumb_url = wp_get_attachment_url($custom_thumb_id);
-                        }
-                    }
-                    // Fallback único e correto para a thumb do post atual
-                    if (empty($thumb_url)) {
-                        $thumb_url = get_the_post_thumbnail_url(get_the_ID(), 'large');
-                    }
-
+                    $meeting_id = (int) get_post_meta(get_the_ID(), 'reuniao_relacionada', true);
+                    $meeting    = $meeting_id ? get_post($meeting_id) : null;
+                    set_query_var('meeting', $meeting);
+                    set_query_var('video', get_post());
                     echo '<div class="col">';
-                    echo '<div class="video-card">';
-                    echo '<div class="video-thumbnail">';
-                    if (!empty($thumb_url)) {
-                        echo '<img src="' . esc_url($thumb_url) . '" alt="' . esc_attr($title) . '">';
-                    }
-                    echo '<div class="play-overlay">▶️</div>';
-                    if ($duration) {
-                        echo '<span class="video-duration">' . esc_html(agert_seconds_to_mmss($duration)) . '</span>';
-                    }
+                    get_template_part('parts/reunioes/card-video');
                     echo '</div>';
-                    echo '<div class="video-info">';
-                    echo '<h3>' . esc_html($title) . '</h3>';
-                    if ($data_hora) {
-                        echo '<p>' . esc_html(date_i18n('d/m/Y', strtotime($data_hora))) . '</p>';
-                    }
-                    if (!empty($video_url)) {
-                        echo '<a href="' . esc_url($video_url) . '" target="_blank" class="btn-assistir">' . __('Assistir Vídeo', 'agert') . '</a>';
-                    }
-                    echo '</div></div></div>';
                 endwhile;
                 echo '</div>';
 
