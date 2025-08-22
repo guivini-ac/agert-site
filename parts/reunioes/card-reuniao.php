@@ -25,6 +25,7 @@ $doc_qtd   = agert_count_documentos($post_id);
 $data_hora = agert_meta($post_id, 'data_hora');
 ?>
 <div class="card card-soft h-100">
+
     <div class="p-3 pb-0">
         <div class="position-relative">
             <?php if ($thumb_url) : ?>
@@ -38,6 +39,7 @@ $data_hora = agert_meta($post_id, 'data_hora');
                 <span class="duration-badge"><?php echo esc_html(agert_seconds_to_mmss((int) $video_dur)); ?></span>
             <?php endif; ?>
         </div>
+
     </div>
     <div class="card-body">
         <?php if ($data_hora) : ?>

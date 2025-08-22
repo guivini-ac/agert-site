@@ -292,7 +292,7 @@ get_header();
             $videos_page  = isset($_GET['videos_page']) ? max(1, (int) $_GET['videos_page']) : 1;
             $video_search = isset($_GET['video_q']) ? sanitize_text_field($_GET['video_q']) : '';
             $video_args   = array(
-                'post_type'      => 'reuniao_video',
+                'post_type'      => 'reuniao',
                 'posts_per_page' => 9,
                 'paged'          => $videos_page,
                 'post_status'    => 'publish',
@@ -379,6 +379,14 @@ get_header();
                         if ($custom_thumb_id) {
                             $thumb_url = wp_get_attachment_url($custom_thumb_id);
                         }
+                        if (!$thumb_url) {
+                            $thumb_url = get_the_post_thumbnail_url($post_id, 'large'); // FIX: fallback único
+                        }
+                    if (!$thumb_url) {
+                        $thumb_url = get_the_post_thumbnail_url(get_the_ID(), 'large');
+                    }
+                    if (!$thumb_url) {
+                        $thumb_url = get_the_post_thumbnail_url(get_the_ID(), 'large');
                     }
                     if (!$thumb_url) {
                         $thumb_url = get_the_post_thumbnail_url(get_the_ID(), 'large');
@@ -432,21 +440,6 @@ get_header();
         </div>
 
     </div>
-
-    <div class="row mt-5 g-4 info-bottom">
-        <div class="col-md-6">
-            <h5><?php _e('Informações sobre as Reuniões', 'agert'); ?></h5>
-            <h6 class="mt-3"><?php _e('Reuniões Ordinárias', 'agert'); ?></h6>
-            <p class="mb-1"><?php _e('As reuniões ordinárias da AGERT acontecem mensalmente, sempre na segunda terça-feira do mês, às 14h00.', 'agert'); ?></p>
-            <p class="mb-1"><?php _e('Sede da AGERT - Sala de Reuniões', 'agert'); ?></p>
-            <p class="mb-0"><?php _e('Rua Principal, 123 - Centro', 'agert'); ?></p>
-        </div>
-        <div class="col-md-6">
-            <h5><?php _e('Participação Pública', 'agert'); ?></h5>
-            <p class="mb-1"><?php _e('As reuniões são abertas ao público e transmitidas ao vivo pelo canal oficial da AGERT no YouTube.', 'agert'); ?></p>
-            <p class="mb-0"><?php _e('Para participar presencialmente, entre em contato conosco através dos canais oficiais com antecedência mínima de 48h.', 'agert'); ?></p>
-        </div>
-    </div>
 </div>
 
 <div class="container py-5">
@@ -467,4 +460,3 @@ get_header();
 </div>
 
 <?php get_footer(); ?>
-
