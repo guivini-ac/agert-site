@@ -29,11 +29,17 @@ function agert_minutes_to_human(int $min): string {
 }
 
 /**
- * Converte segundos para mm:ss.
+ * Converte segundos para mm:ss ou hh:mm:ss quando necessário.
  */
 function agert_seconds_to_mmss(int $sec): string {
-    $minutes = floor($sec / 60);
+    $hours   = floor($sec / 3600);
+    $minutes = floor(($sec % 3600) / 60);
     $seconds = $sec % 60;
+
+    if ($hours > 0) {
+        return sprintf('%d:%02d:%02d', $hours, $minutes, $seconds);
+    }
+
     return sprintf('%02d:%02d', $minutes, $seconds);
 }
 
@@ -51,6 +57,50 @@ function agert_bytes_to_human(int $bytes): string {
 }
 
 /**
+ * Detecta a plataforma de vídeo a partir da URL.
+ */
+function agert_detectar_plataforma_video(string $url): string {
+    if (strpos($url, 'youtube.com') !== false || strpos($url, 'youtu.be') !== false) {
+        return 'youtube';
+    }
+    if (strpos($url, 'vimeo.com') !== false) {
+        return 'vimeo';
+    }
+    return 'outro';
+}
+
+/**
+ * Extrai o ID de um vídeo do YouTube.
+ */
+function agert_extrair_youtube_id(string $url): string {
+    if (preg_match('/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/', $url, $matches)) {
+        return $matches[1];
+    }
+    return '';
+}
+
+/**
+ * Retorna a URL da thumbnail do YouTube.
+ */
+function agert_thumbnail_youtube(string $id): string {
+    return "https://img.youtube.com/vi/{$id}/maxresdefault.jpg";
+}
+
+/**
+ * Obtém a thumbnail do Vimeo via oEmbed.
+ */
+function agert_thumbnail_vimeo(string $url): string {
+    $response = wp_remote_get('https://vimeo.com/api/oembed.json?url=' . rawurlencode($url));
+    if (!is_wp_error($response)) {
+        $data = json_decode(wp_remote_retrieve_body($response));
+        if (!empty($data->thumbnail_url)) {
+            return $data->thumbnail_url;
+        }
+    }
+    return '';
+}
+
+/**
  * Retorna o ano de uma string datetime.
  */
 function agert_get_year_from_datetime(string $dt): int {
@@ -62,8 +112,6 @@ function agert_get_year_from_datetime(string $dt): int {
  * Conta documentos relacionados à reunião.
  */
 function agert_count_documentos(int $post_id): int {
-    $docs = get_post_meta($post_id, 'anexos', true);
-
     $docs = get_posts(array(
         'post_type'      => 'anexo',
         'post_status'    => 'publish',
@@ -88,7 +136,58 @@ function agert_reuniao_has_video(int $post_id): bool {
         'fields'         => 'ids',
         'posts_per_page' => 1,
     ));
+
     return !empty($videos);
+}
+
+/**
+ * Obtém dados do primeiro vídeo associado à reunião.
+ *
+ * @param int $post_id ID da reunião.
+ * @return array{url:string, duration:int, thumb:string}|array
+ */
+function agert_get_reuniao_video_data(int $post_id): array {
+    $videos = get_posts(array(
+        'post_type'      => 'reuniao_video',
+        'post_status'    => 'publish',
+        'meta_key'       => 'reuniao_relacionada',
+        'meta_value'     => $post_id,
+        'posts_per_page' => 1,
+    ));
+
+    if (empty($videos)) {
+        return array();
+    }
+
+    $video    = $videos[0];
+    $url      = get_post_meta($video->ID, 'video_url', true);
+    $duration = (int) get_post_meta($video->ID, 'duracao_segundos', true);
+    $thumb    = '';
+
+    $platform = agert_detectar_plataforma_video($url);
+    if ($platform === 'youtube') {
+        $yt = agert_extrair_youtube_id($url);
+        if ($yt) {
+            $thumb = agert_thumbnail_youtube($yt);
+        }
+    } elseif ($platform === 'vimeo') {
+        $thumb = agert_thumbnail_vimeo($url);
+    } else {
+        $custom_thumb_id = get_post_meta($video->ID, 'thumbnail_personalizada', true);
+        if ($custom_thumb_id) {
+            $thumb = wp_get_attachment_url($custom_thumb_id);
+        }
+    }
+
+    if (!$thumb) {
+        $thumb = get_the_post_thumbnail_url($video->ID, 'large');
+    }
+
+    return array(
+        'url'      => $url,
+        'duration' => $duration,
+        'thumb'    => $thumb,
+    );
 }
 
 /**
