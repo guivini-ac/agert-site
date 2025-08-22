@@ -219,9 +219,14 @@ get_header(); ?>
         <div class="row mb-3">
             <div class="col-md-4 ms-auto">
                 <label for="agenda-fiscal-date-filter" class="form-label mb-0">
-                    <?php _e('Filtrar por data', 'agert'); ?>
+                    <?php _e('Filtrar por mês/ano', 'agert'); ?>
                 </label>
-                <input type="date" id="agenda-fiscal-date-filter" class="form-control">
+                <div class="input-group">
+                    <input type="month" id="agenda-fiscal-date-filter" class="form-control">
+                    <button class="btn btn-outline-secondary" id="agenda-fiscal-go-btn">
+                        <?php _e('Ir', 'agert'); ?>
+                    </button>
+                </div>
             </div>
         </div>
         <div id="agenda-fiscal-calendar"></div>
