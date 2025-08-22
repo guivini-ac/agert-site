@@ -11,7 +11,7 @@ get_header(); ?>
 <section class="hero-section">
     <div class="container">
         <div class="row align-items-center min-vh-50">
-            <div class="col-lg-8">
+            <div class="col-lg-12">
                 <h1 class="display-4 mb-4">AGERT</h1>
                 <p class="lead mb-4">
                     <?php _e('Agência Reguladora de Serviços Públicos Delegados do Município de Timon', 'agert'); ?>
@@ -24,11 +24,6 @@ get_header(); ?>
                         <i class="bi bi-info-circle me-2"></i>
                         <?php _e('Conheça a AGERT', 'agert'); ?>
                     </a>
-                </div>
-            </div>
-            <div class="col-lg-4 text-center">
-                <div class="bg-white bg-opacity-10 rounded-3 p-4">
-                    <i class="bi bi-building display-1 text-white opacity-75"></i>
                 </div>
             </div>
         </div>
