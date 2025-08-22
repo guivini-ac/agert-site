@@ -170,6 +170,7 @@ get_header();
                 'orderby'        => 'date',
                 'order'          => 'DESC',
                 's'              => $doc_search,
+
                 'meta_query'     => array(
                     array(
                         'key'     => '_arquivo_id',
@@ -214,6 +215,7 @@ get_header();
                     $file_path  = get_attached_file($arquivo_id);
                     $file_size  = ($file_path && file_exists($file_path)) ? size_format(filesize($file_path)) : '';
                     $thumb      = wp_get_attachment_image($arquivo_id, 'thumbnail', true);
+
                     $upload_date = get_the_date('d/m/Y');
                     echo '<div class="col">';
                     echo '<div class="documento-card">';
@@ -265,7 +267,7 @@ get_header();
             $videos_page  = isset($_GET['videos_page']) ? max(1, (int) $_GET['videos_page']) : 1;
             $video_search = isset($_GET['video_q']) ? sanitize_text_field($_GET['video_q']) : '';
             $video_args   = array(
-                'post_type'      => 'reuniao_video',
+                'post_type'      => 'reuniao',
                 'posts_per_page' => 9,
                 'paged'          => $videos_page,
                 'post_status'    => 'publish',
@@ -274,6 +276,7 @@ get_header();
                 'order'          => 'DESC',
                 'meta_query'     => array(
                     array(
+
                         'key'     => 'video_url',
                         'value'   => '',
                         'compare' => '!=',
@@ -282,6 +285,7 @@ get_header();
             );
 
             if ($selected_year) {
+
                 $reunioes_ids = get_posts(array(
                     'post_type'      => 'reuniao',
                     'post_status'    => 'publish',
@@ -309,6 +313,7 @@ get_header();
                         'compare' => '=',
                     );
                 }
+
             }
 
             $videos_query = new WP_Query($video_args);
@@ -340,6 +345,7 @@ get_header();
                     $data_hora   = $reuniao_id ? agert_meta($reuniao_id, 'data_hora') : '';
                     $thumb_url   = '';
                     $platform    = agert_detectar_plataforma_video($video_url);
+
                     if ($platform === 'youtube') {
                         $yt_id = agert_extrair_youtube_id($video_url);
                         if ($yt_id) {
