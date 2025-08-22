@@ -172,7 +172,6 @@ get_header();
                 's'              => $doc_search,
                 'meta_query'     => array(
                     'relation' => 'AND',
-
                     array(
                         'key'     => '_arquivo_id',
                         'compare' => 'EXISTS',
@@ -302,7 +301,6 @@ get_header();
                 'order'          => 'DESC',
                 'meta_query'     => array(
                     array(
-
                         'key'     => 'video_url',
                         'value'   => '',
                         'compare' => '!=',
@@ -311,7 +309,6 @@ get_header();
             );
 
             if ($selected_year) {
-
                 $reunioes_ids = get_posts(array(
                     'post_type'      => 'reuniao',
                     'post_status'    => 'publish',
@@ -370,23 +367,24 @@ get_header();
                     $data_hora   = $reuniao_id ? agert_meta($reuniao_id, 'data_hora') : '';
                     $thumb_url   = '';
                     $platform    = agert_detectar_plataforma_video($video_url);
-
-                        if ($platform === 'youtube') {
-                            $yt_id = agert_extrair_youtube_id($video_url);
-                            if ($yt_id) {
-                                $thumb_url = agert_thumbnail_youtube($yt_id);
-                            }
-                        } elseif ($platform === 'vimeo') {
-                            $thumb_url = agert_thumbnail_vimeo($video_url);
-                        } else {
-                            $custom_thumb_id = (int) get_post_meta($post_id, 'thumbnail_personalizada', true);
-                            if ($custom_thumb_id) {
-                                $thumb_url = wp_get_attachment_url($custom_thumb_id);
-                            }
+                    if ($platform === 'youtube') {
+                        $yt_id = agert_extrair_youtube_id($video_url);
+                        if ($yt_id) {
+                            $thumb_url = agert_thumbnail_youtube($yt_id);
+                        }
+                    } elseif ($platform === 'vimeo') {
+                        $thumb_url = agert_thumbnail_vimeo($video_url);
+                    } else {
+                        $custom_thumb_id = get_post_meta(get_the_ID(), 'thumbnail_personalizada', true);
+                        if ($custom_thumb_id) {
+                            $thumb_url = wp_get_attachment_url($custom_thumb_id);
                         }
                         if (!$thumb_url) {
                             $thumb_url = get_the_post_thumbnail_url($post_id, 'large'); // FIX: fallback único
                         }
+                    if (!$thumb_url) {
+                        $thumb_url = get_the_post_thumbnail_url(get_the_ID(), 'large');
+                    }
                     if (!$thumb_url) {
                         $thumb_url = get_the_post_thumbnail_url(get_the_ID(), 'large');
                     }
