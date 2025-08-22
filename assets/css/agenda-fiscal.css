@@ -5,3 +5,8 @@
 .agenda-card .badge { background: var(--brand); }
 
 .agenda-card small { color: var(--muted); }
+
+.agenda-filters { border: 1px solid var(--line); border-radius: 8px; padding: 1rem; background: var(--bg); }
+
+.agenda-pagination { display: flex; justify-content: center; }
+.agenda-pagination .page-numbers { margin: 0 .25rem; }
