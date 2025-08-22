@@ -163,19 +163,19 @@ get_header();
             $docs_paged = isset($_GET['docs_page']) ? max(1, (int) $_GET['docs_page']) : 1;
             $doc_search = isset($_GET['doc_q']) ? sanitize_text_field($_GET['doc_q']) : '';
             $doc_args   = array(
-                'post_type'      => 'attachment',
-                'post_status'    => 'inherit',
+                'post_type'      => 'anexo',
+                'post_status'    => 'publish',
                 'posts_per_page' => 9,
                 'paged'          => $docs_paged,
                 'orderby'        => 'date',
                 'order'          => 'DESC',
                 's'              => $doc_search,
-                'post_mime_type' => array(
-                    'application/pdf',
-                    'application/msword',
-                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                    'application/vnd.ms-excel',
-                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+
+                'meta_query'     => array(
+                    array(
+                        'key'     => '_arquivo_id',
+                        'compare' => 'EXISTS',
+                    ),
                 ),
             );
 
@@ -209,10 +209,13 @@ get_header();
             if ($attachments->have_posts()) {
                 echo '<div class="row row-cols-1 row-cols-md-3 g-4">';
                 while ($attachments->have_posts()) : $attachments->the_post();
-                    $file_url   = wp_get_attachment_url(get_the_ID());
-                    $file_path  = get_attached_file(get_the_ID());
-                    $file_size  = $file_path && file_exists($file_path) ? size_format(filesize($file_path)) : '';
-                    $thumb      = wp_get_attachment_image(get_the_ID(), 'thumbnail', true);
+                    $arquivo_id  = (int) get_post_meta(get_the_ID(), '_arquivo_id', true);
+                    if (!$arquivo_id) { continue; }
+                    $file_url   = wp_get_attachment_url($arquivo_id);
+                    $file_path  = get_attached_file($arquivo_id);
+                    $file_size  = ($file_path && file_exists($file_path)) ? size_format(filesize($file_path)) : '';
+                    $thumb      = wp_get_attachment_image($arquivo_id, 'thumbnail', true);
+
                     $upload_date = get_the_date('d/m/Y');
                     echo '<div class="col">';
                     echo '<div class="documento-card">';
@@ -227,7 +230,7 @@ get_header();
                     if ($file_size) {
                         echo '<p>' . sprintf(__('Tamanho: %s', 'agert'), esc_html($file_size)) . '</p>';
                     }
-                    echo '<a href="' . esc_url($file_url) . '" class="btn-download btn btn-brand" download><i class="icon-download"></i> ' . __('Download PDF', 'agert') . '</a>';
+                    echo '<a href="' . esc_url($file_url) . '" class="btn-download btn btn-brand" download><i class="icon-download"></i> ' . __('Download', 'agert') . '</a>';
                     echo '</div></div></div>';
                 endwhile;
                 echo '</div>';
@@ -273,7 +276,8 @@ get_header();
                 'order'          => 'DESC',
                 'meta_query'     => array(
                     array(
-                        'key'     => 'url_video',
+
+                        'key'     => 'video_url',
                         'value'   => '',
                         'compare' => '!=',
                     ),
@@ -281,12 +285,35 @@ get_header();
             );
 
             if ($selected_year) {
-                $video_args['meta_query'][] = array(
-                    'key'     => 'data_hora',
-                    'value'   => array($selected_year . '-01-01', $selected_year . '-12-31 23:59:59'),
-                    'compare' => 'BETWEEN',
-                    'type'    => 'DATETIME',
-                );
+
+                $reunioes_ids = get_posts(array(
+                    'post_type'      => 'reuniao',
+                    'post_status'    => 'publish',
+                    'fields'         => 'ids',
+                    'posts_per_page' => -1,
+                    'meta_query'     => array(
+                        array(
+                            'key'     => 'data_hora',
+                            'value'   => array($selected_year . '-01-01', $selected_year . '-12-31 23:59:59'),
+                            'compare' => 'BETWEEN',
+                            'type'    => 'DATETIME',
+                        ),
+                    ),
+                ));
+                if ($reunioes_ids) {
+                    $video_args['meta_query'][] = array(
+                        'key'     => 'reuniao_relacionada',
+                        'value'   => $reunioes_ids,
+                        'compare' => 'IN',
+                    );
+                } else {
+                    $video_args['meta_query'][] = array(
+                        'key'     => 'reuniao_relacionada',
+                        'value'   => 0,
+                        'compare' => '=',
+                    );
+                }
+
             }
 
             $videos_query = new WP_Query($video_args);
@@ -311,12 +338,14 @@ get_header();
             if ($videos_query->have_posts()) {
                 echo '<div class="row row-cols-1 row-cols-md-3 g-4">';
                 while ($videos_query->have_posts()) : $videos_query->the_post();
-                    $video_url = get_post_meta(get_the_ID(), 'url_video', true);
-                    $duration  = (int) get_post_meta(get_the_ID(), 'duracao_segundos', true);
-                    $title     = get_the_title();
-                    $data_hora = agert_meta(get_the_ID(), 'data_hora');
-                    $thumb_url = '';
-                    $platform  = agert_detectar_plataforma_video($video_url);
+                    $video_url   = get_post_meta(get_the_ID(), 'video_url', true);
+                    $duration    = (int) get_post_meta(get_the_ID(), 'duracao_segundos', true);
+                    $reuniao_id  = (int) get_post_meta(get_the_ID(), 'reuniao_relacionada', true);
+                    $title       = $reuniao_id ? get_the_title($reuniao_id) : get_the_title();
+                    $data_hora   = $reuniao_id ? agert_meta($reuniao_id, 'data_hora') : '';
+                    $thumb_url   = '';
+                    $platform    = agert_detectar_plataforma_video($video_url);
+
                     if ($platform === 'youtube') {
                         $yt_id = agert_extrair_youtube_id($video_url);
                         if ($yt_id) {

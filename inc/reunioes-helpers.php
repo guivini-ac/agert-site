@@ -106,8 +106,6 @@ function agert_get_year_from_datetime(string $dt): int {
  * Conta documentos relacionados à reunião.
  */
 function agert_count_documentos(int $post_id): int {
-    $docs = get_post_meta($post_id, 'anexos', true);
-
     $docs = get_posts(array(
         'post_type'      => 'anexo',
         'post_status'    => 'publish',
@@ -124,8 +122,17 @@ function agert_count_documentos(int $post_id): int {
  * Verifica se reunião possui vídeo.
  */
 function agert_reuniao_has_video(int $post_id): bool {
-    $url = get_post_meta($post_id, 'url_video', true);
-    return !empty($url);
+    $videos = get_posts(array(
+        'post_type'      => 'reuniao_video',
+        'post_status'    => 'publish',
+        'meta_key'       => 'reuniao_relacionada',
+        'meta_value'     => $post_id,
+        'fields'         => 'ids',
+        'posts_per_page' => 1,
+    ));
+
+    return !empty($videos);
+
 }
 
 /**
