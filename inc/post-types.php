@@ -329,16 +329,6 @@ function agert_participante_meta_box_callback($post) {
     $nome_participante = get_post_meta($post->ID, '_nome_participante', true);
     $cargo = get_post_meta($post->ID, '_cargo', true);
     $email = get_post_meta($post->ID, '_email', true);
-    $reuniao_id = get_post_meta($post->ID, '_reuniao_id', true);
-    
-    // Buscar reuniões para select
-    $reunioes = get_posts(array(
-        'post_type' => 'reuniao',
-        'posts_per_page' => -1,
-        'post_status' => 'publish',
-        'orderby' => 'date',
-        'order' => 'DESC'
-    ));
     ?>
     <table class="form-table">
         <tr>
@@ -352,20 +342,6 @@ function agert_participante_meta_box_callback($post) {
         <tr>
             <th><label for="email"><?php _e('E-mail', 'agert'); ?></label></th>
             <td><input type="email" id="email" name="email" value="<?php echo esc_attr($email); ?>" class="regular-text" /></td>
-        </tr>
-        <tr>
-            <th><label for="reuniao_id"><?php _e('Reunião', 'agert'); ?></label></th>
-            <td>
-                <select id="reuniao_id" name="reuniao_id" class="regular-text">
-                    <option value=""><?php _e('Selecione uma reunião', 'agert'); ?></option>
-                    <?php foreach ($reunioes as $reuniao) : ?>
-                        <option value="<?php echo $reuniao->ID; ?>" <?php selected($reuniao_id, $reuniao->ID); ?>>
-                            <?php echo esc_html($reuniao->post_title); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </td>
-        </tr>
     </table>
     <?php
 }
@@ -556,9 +532,6 @@ function agert_save_meta_boxes($post_id) {
         }
         if (isset($_POST['email'])) {
             update_post_meta($post_id, '_email', sanitize_email($_POST['email']));
-        }
-        if (isset($_POST['reuniao_id'])) {
-            update_post_meta($post_id, '_reuniao_id', intval($_POST['reuniao_id']));
         }
     }
 

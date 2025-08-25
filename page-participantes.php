@@ -12,9 +12,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_participant_no
         $nome       = agert_sanitize_text($_POST['nome_participante'] ?? '');
         $cargo      = agert_sanitize_text($_POST['cargo'] ?? '');
         $email      = sanitize_email($_POST['email'] ?? '');
-        $reuniao_id = intval($_POST['reuniao_id'] ?? 0);
 
-        if ($nome && $email && $reuniao_id) {
+        if ($nome && $email) {
             $participant_id = wp_insert_post(array(
                 'post_title'  => $nome,
                 'post_type'   => 'participante',
@@ -25,7 +24,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_participant_no
                 update_post_meta($participant_id, '_nome_participante', $nome);
                 update_post_meta($participant_id, '_cargo', $cargo);
                 update_post_meta($participant_id, '_email', $email);
-                update_post_meta($participant_id, '_reuniao_id', $reuniao_id);
                 wp_redirect(esc_url(add_query_arg('status', 'participante_created', esc_url(get_permalink()))));
                 exit;
             }
@@ -72,20 +70,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_participant_no
                         <th><?php _e('Nome', 'agert'); ?></th>
                         <th><?php _e('Cargo', 'agert'); ?></th>
                         <th><?php _e('E-mail', 'agert'); ?></th>
-                        <th><?php _e('Reunião', 'agert'); ?></th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php while ($participants->have_posts()) : $participants->the_post();
-                        $reuniao_id = get_post_meta(get_the_ID(), '_reuniao_id', true);
-                        $cargo      = get_post_meta(get_the_ID(), '_cargo', true);
-                        $email      = get_post_meta(get_the_ID(), '_email', true);
+                        $cargo = get_post_meta(get_the_ID(), '_cargo', true);
+                        $email = get_post_meta(get_the_ID(), '_email', true);
                     ?>
                         <tr>
                             <td><?php the_title(); ?></td>
                             <td><?php echo esc_html($cargo); ?></td>
                             <td><?php echo esc_html($email); ?></td>
-                            <td><?php echo $reuniao_id ? esc_html(get_the_title($reuniao_id)) : '-'; ?></td>
                         </tr>
                     <?php endwhile; ?>
                 </tbody>
@@ -122,12 +117,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_participant_no
                     <div class="mb-3">
                         <label for="email" class="form-label"><?php _e('E-mail', 'agert'); ?></label>
                         <input type="email" id="email" name="email" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="reuniao_id" class="form-label"><?php _e('Reunião', 'agert'); ?></label>
-                        <select id="reuniao_id" name="reuniao_id" class="form-select" required data-load-meetings>
-                            <option value=""><?php _e('Selecione uma reunião', 'agert'); ?></option>
-                        </select>
                     </div>
                 </div>
                 <div class="modal-footer">
