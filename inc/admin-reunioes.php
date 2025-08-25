@@ -538,5 +538,31 @@ function agert_video_columns_content($col, $post_id) {
 }
 add_action('manage_reuniao_video_posts_custom_column', 'agert_video_columns_content', 10, 2);
 
+/**
+ * Remove vídeos associados ao excluir uma reunião.
+ *
+ * @param int $post_id ID da reunião.
+ */
+function agert_delete_reuniao_videos(int $post_id) {
+    if (get_post_type($post_id) !== 'reuniao') {
+        return;
+    }
+
+    $videos = get_posts(array(
+        'post_type'      => 'reuniao_video',
+        'post_status'    => 'any',
+        'meta_key'       => 'reuniao_relacionada',
+        'meta_value'     => $post_id,
+        'fields'         => 'ids',
+        'posts_per_page' => -1,
+    ));
+
+    foreach ($videos as $vid) {
+        wp_delete_post($vid, true);
+    }
+}
+add_action('before_delete_post', 'agert_delete_reuniao_videos');
+add_action('wp_trash_post', 'agert_delete_reuniao_videos');
+
 ?>
 
