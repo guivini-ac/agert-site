@@ -183,10 +183,6 @@ get_header(); ?>
                             <h5><?php _e('Nenhuma reunião encontrada', 'agert'); ?></h5>
                             <p class="text-muted"><?php _e('Ainda não há reuniões cadastradas no sistema.', 'agert'); ?></p>
                             <?php if (agert_user_can_create_posts()) : ?>
-                                <a href="<?php echo esc_url(agert_get_page_link('acervo')); ?>" class="btn btn-primary">
-                                    <i class="bi bi-plus-circle me-2"></i>
-                                    <?php _e('Criar primeira reunião', 'agert'); ?>
-                                </a>
                             <?php endif; ?>
                         </div>
                     </div>
