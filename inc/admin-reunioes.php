@@ -67,6 +67,14 @@ function agert_nova_reuniao_page() {
         'orderby'        => 'title',
         'order'          => 'ASC',
     ));
+
+    $anexos_posts = get_posts(array(
+        'post_type'      => 'anexo',
+        'posts_per_page' => -1,
+        'post_status'    => 'publish',
+        'orderby'        => 'title',
+        'order'          => 'ASC',
+    ));
     ?>
     <div class="wrap">
         <h1><?php _e('Nova Reunião', 'agert'); ?></h1>
@@ -118,32 +126,17 @@ function agert_nova_reuniao_page() {
                 <tr>
                     <th><?php _e('Anexos', 'agert'); ?></th>
                     <td>
-                        <input type="hidden" id="anexos" name="anexos" value="" />
-                        <button type="button" class="button" id="agert-select-anexos"><?php _e('Selecionar arquivos', 'agert'); ?></button>
-                        <span id="agert-anexos-list" style="margin-left:10px"></span>
+                        <select id="anexos" name="anexos[]" multiple style="width:300px;height:100px;">
+                            <?php foreach ($anexos_posts as $a) : ?>
+                                <option value="<?php echo $a->ID; ?>"><?php echo esc_html($a->post_title); ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </td>
                 </tr>
             </table>
             <?php submit_button(__('Criar Reunião', 'agert')); ?>
         </form>
     </div>
-    <script>
-    jQuery(function($){
-        var frame;
-        $('#agert-select-anexos').on('click', function(e){
-            e.preventDefault();
-            if(frame){frame.open();return;}
-            frame = wp.media({multiple:true});
-            frame.on('select', function(){
-                var ids = frame.state().get('selection').map(function(a){return a.id;}).join(',');
-                $('#anexos').val(ids);
-                var names = frame.state().get('selection').map(function(a){return a.get('filename');}).join(', ');
-                $('#agert-anexos-list').text(names);
-            });
-            frame.open();
-        });
-    });
-    </script>
     <?php
 }
 
@@ -176,7 +169,7 @@ function agert_save_reuniao_meta_from_request($post_id) {
     $decisoes = isset($_POST['decisoes']) ? array_filter(array_map('sanitize_text_field', preg_split('/\r\n|\r|\n/', $_POST['decisoes']))) : array();
     update_post_meta($post_id, 'decisoes', $decisoes);
 
-    $anexos = isset($_POST['anexos']) && $_POST['anexos'] !== '' ? array_map('intval', explode(',', $_POST['anexos'])) : array();
+    $anexos = isset($_POST['anexos']) ? array_map('intval', (array) $_POST['anexos']) : array();
     update_post_meta($post_id, 'anexos', $anexos);
 }
 
@@ -213,6 +206,14 @@ function agert_reuniao_meta_box($post) {
         'post_status' => 'publish',
         'orderby' => 'title',
         'order' => 'ASC',
+    ));
+
+    $anexos_posts = get_posts(array(
+        'post_type'      => 'anexo',
+        'posts_per_page' => -1,
+        'post_status'    => 'publish',
+        'orderby'        => 'title',
+        'order'          => 'ASC',
     ));
 
     $videos = get_posts(array(
@@ -265,18 +266,11 @@ function agert_reuniao_meta_box($post) {
         <tr>
             <th><?php _e('Anexos', 'agert'); ?></th>
             <td>
-                <input type="hidden" id="anexos" name="anexos" value="<?php echo esc_attr(implode(',', $anexos)); ?>" />
-                <button type="button" class="button" id="agert-select-anexos"><?php _e('Selecionar arquivos', 'agert'); ?></button>
-                <span id="agert-anexos-list" style="margin-left:10px;">
-                    <?php
-                    $names = array();
-                    foreach ($anexos as $aid) {
-                        $file = get_attached_file($aid);
-                        if ($file) { $names[] = basename($file); }
-                    }
-                    echo esc_html(implode(', ', $names));
-                    ?>
-                </span>
+                <select id="anexos" name="anexos[]" multiple style="width:300px;height:100px;">
+                    <?php foreach ($anexos_posts as $a) : ?>
+                        <option value="<?php echo $a->ID; ?>" <?php selected(in_array($a->ID, $anexos, true)); ?>><?php echo esc_html($a->post_title); ?></option>
+                    <?php endforeach; ?>
+                </select>
             </td>
         </tr>
         <?php if ($videos) : ?>
@@ -298,23 +292,6 @@ function agert_reuniao_meta_box($post) {
         </tr>
         <?php endif; ?>
     </table>
-    <script>
-    jQuery(function($){
-        var frame;
-        $('#agert-select-anexos').on('click', function(e){
-            e.preventDefault();
-            if(frame){frame.open();return;}
-            frame = wp.media({multiple:true});
-            frame.on('select', function(){
-                var ids = frame.state().get('selection').map(function(a){return a.id;}).join(',');
-                $('#anexos').val(ids);
-                var names = frame.state().get('selection').map(function(a){return a.get('filename');}).join(', ');
-                $('#agert-anexos-list').text(names);
-            });
-            frame.open();
-        });
-    });
-    </script>
     <?php
 }
 
