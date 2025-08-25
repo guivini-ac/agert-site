@@ -23,7 +23,13 @@
 
 /* Marca (logo + textos) */
 .brand { display:flex; align-items:center; gap:12px; text-decoration:none; color:inherit; }
-.brand__logo img { height:34px; width:auto; display:block; }
+.brand__logo img {
+  width:34px;
+  height:34px;
+  object-fit:contain;
+  display:inline-block;
+  overflow:hidden;
+}
 .brand__logo--placeholder { width:34px; height:34px; border-radius:8px; background:#23243a; display:inline-block; }
 .brand__text { display:flex; flex-direction:column; line-height:1.1; }
 .brand__title { font-size:20px; font-weight:700; color:#ffffff; }
