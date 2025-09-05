@@ -15,12 +15,13 @@ Requires PHP: 7.4
 /* ===== VARIÁVEIS CSS BASEADAS NO DESIGN SYSTEM ORIGINAL ===== */
 :root {
   /* Paleta principal baseada nas cores da logo */
-  --agert-primary: #395daa; /* azul */
+  --agert-primary: #395DAA; /* azul da logo */
   --agert-primary-rgb: 57, 93, 170;
-  --agert-primary-foreground: #ffffff;
-  --agert-secondary: #f2bc26; /* amarelo */
+  --agert-primary-foreground: #FFFFFF;
+  --agert-secondary: #F2BC26; /* amarelo da logo */
+  --agert-secondary-rgb: 242, 188, 38;
   --agert-secondary-foreground: #030213;
-  --agert-background: #ffffff;
+  --agert-background: #FFFFFF;
   --agert-foreground: #212529;
   --agert-muted: #6c757d;
   --agert-muted-light: #f8f9fa;
@@ -29,12 +30,16 @@ Requires PHP: 7.4
 
   /* Variantes de cor */
   --agert-primary-dark: #2d4a88; /* azul escurecido para hover */
+  --agert-primary-light: rgba(57, 93, 170, 0.1); /* azul claro para backgrounds */
+  --agert-secondary-light: rgba(242, 188, 38, 0.1); /* amarelo claro para backgrounds */
 
   /* Sobrescritas do Bootstrap */
   --bs-primary: var(--agert-primary);
   --bs-primary-rgb: var(--agert-primary-rgb);
+  --bs-secondary: var(--agert-secondary);
+  --bs-secondary-rgb: var(--agert-secondary-rgb);
   --bs-warning: var(--agert-secondary);
-  --bs-warning-rgb: 242, 188, 38;
+  --bs-warning-rgb: var(--agert-secondary-rgb);
   --bs-link-color: var(--agert-primary);
   --bs-link-color-rgb: var(--agert-primary-rgb);
   --bs-link-hover-color: var(--agert-primary-dark);
@@ -89,10 +94,13 @@ body {
 .btn-primary {
   --bs-btn-bg: var(--agert-primary);
   --bs-btn-border-color: var(--agert-primary);
+  --bs-btn-color: var(--agert-primary-foreground);
   --bs-btn-hover-bg: rgba(var(--agert-primary-rgb), 0.9);
   --bs-btn-hover-border-color: rgba(var(--agert-primary-rgb), 0.9);
+  --bs-btn-hover-color: var(--agert-primary-foreground);
   --bs-btn-active-bg: rgba(var(--agert-primary-rgb), 0.8);
   --bs-btn-active-border-color: rgba(var(--agert-primary-rgb), 0.8);
+  --bs-btn-active-color: var(--agert-primary-foreground);
 }
 
 .btn-outline-primary {
@@ -100,20 +108,60 @@ body {
   --bs-btn-border-color: var(--agert-primary);
   --bs-btn-hover-bg: var(--agert-primary);
   --bs-btn-hover-border-color: var(--agert-primary);
+  --bs-btn-hover-color: var(--agert-primary-foreground);
   --bs-btn-active-bg: var(--agert-primary);
   --bs-btn-active-border-color: var(--agert-primary);
+  --bs-btn-active-color: var(--agert-primary-foreground);
+}
+
+/* Cores secundárias (amarelo) */
+.btn-secondary {
+  --bs-btn-bg: var(--agert-secondary);
+  --bs-btn-border-color: var(--agert-secondary);
+  --bs-btn-color: var(--agert-secondary-foreground);
+  --bs-btn-hover-bg: rgba(var(--agert-secondary-rgb), 0.9);
+  --bs-btn-hover-border-color: rgba(var(--agert-secondary-rgb), 0.9);
+  --bs-btn-hover-color: var(--agert-secondary-foreground);
+  --bs-btn-active-bg: rgba(var(--agert-secondary-rgb), 0.8);
+  --bs-btn-active-border-color: rgba(var(--agert-secondary-rgb), 0.8);
+  --bs-btn-active-color: var(--agert-secondary-foreground);
+}
+
+.btn-outline-secondary {
+  --bs-btn-color: var(--agert-secondary);
+  --bs-btn-border-color: var(--agert-secondary);
+  --bs-btn-hover-bg: var(--agert-secondary);
+  --bs-btn-hover-border-color: var(--agert-secondary);
+  --bs-btn-hover-color: var(--agert-secondary-foreground);
+  --bs-btn-active-bg: var(--agert-secondary);
+  --bs-btn-active-border-color: var(--agert-secondary);
+  --bs-btn-active-color: var(--agert-secondary-foreground);
 }
 
 .bg-primary {
   background-color: var(--agert-primary) !important;
+  color: var(--agert-primary-foreground) !important;
+}
+
+.bg-secondary {
+  background-color: var(--agert-secondary) !important;
+  color: var(--agert-secondary-foreground) !important;
 }
 
 .text-primary {
   color: var(--agert-primary) !important;
 }
 
+.text-secondary {
+  color: var(--agert-secondary) !important;
+}
+
 .border-primary {
   border-color: var(--agert-primary) !important;
+}
+
+.border-secondary {
+  border-color: var(--agert-secondary) !important;
 }
 
 /* Cards personalizados */
@@ -122,6 +170,7 @@ body {
   border-radius: var(--agert-radius);
   box-shadow: var(--agert-shadow-sm);
   transition: all 0.2s ease-in-out;
+  background-color: var(--agert-background);
 }
 
 .card:hover {
@@ -130,8 +179,9 @@ body {
 }
 
 .card-header {
-  background-color: var(--agert-muted-light);
+  background-color: var(--agert-primary-light);
   border-bottom: 1px solid var(--agert-border);
+  color: var(--agert-primary);
 }
 
 /* Formulários */
@@ -172,7 +222,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" stroke-width="0.5" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%23FFFFFF" stroke-width="0.5" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
   opacity: 0.1;
 }
 
@@ -221,15 +271,15 @@ body {
 }
 
 .status-message.success {
-  background-color: #d1e7dd;
-  color: #0f5132;
-  border-color: #badbcc;
+  background-color: var(--agert-primary-light);
+  color: var(--agert-primary);
+  border-color: var(--agert-primary);
 }
 
 .status-message.error {
-  background-color: #f8d7da;
-  color: #842029;
-  border-color: #f5c2c7;
+  background-color: var(--agert-secondary-light);
+  color: var(--agert-secondary-foreground);
+  border-color: var(--agert-secondary);
 }
 
 /* Navbar customizado */
@@ -334,21 +384,43 @@ body {
 }
 
 .alert-success {
-  background-color: #d1e7dd;
-  border-color: #badbcc;
-  color: #0f5132;
+  background-color: var(--agert-primary-light);
+  border-color: var(--agert-primary);
+  color: var(--agert-primary);
 }
 
 .alert-danger {
-  background-color: #f8d7da;
-  border-color: #f5c2c7;
-  color: #842029;
+  background-color: var(--agert-secondary-light);
+  border-color: var(--agert-secondary);
+  color: var(--agert-secondary-foreground);
+}
+
+.alert-warning {
+  background-color: var(--agert-secondary-light);
+  border-color: var(--agert-secondary);
+  color: var(--agert-secondary-foreground);
+}
+
+.alert-info {
+  background-color: var(--agert-primary-light);
+  border-color: var(--agert-primary);
+  color: var(--agert-primary);
 }
 
 /* Badges */
 .badge {
   font-size: 0.75rem;
   font-weight: var(--agert-font-weight-medium);
+}
+
+.badge.bg-primary {
+  background-color: var(--agert-primary) !important;
+  color: var(--agert-primary-foreground) !important;
+}
+
+.badge.bg-secondary {
+  background-color: var(--agert-secondary) !important;
+  color: var(--agert-secondary-foreground) !important;
 }
 
 /* Tabelas */
@@ -358,7 +430,13 @@ body {
 
 .table-striped > tbody > tr:nth-of-type(odd) > td,
 .table-striped > tbody > tr:nth-of-type(odd) > th {
-  background-color: var(--agert-muted-light);
+  background-color: var(--agert-primary-light);
+}
+
+.table thead th {
+  background-color: var(--agert-primary);
+  color: var(--agert-primary-foreground);
+  border-color: var(--agert-primary);
 }
 
 /* ===== RESPONSIVIDADE ===== */
