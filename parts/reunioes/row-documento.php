@@ -52,5 +52,5 @@ $same_domain = strpos($file_url, home_url()) === 0;
     </div>
     <?php if ($size_h) : ?><span class="doc-size"><?php echo esc_html($size_h); ?></span><?php endif; ?>
     <a href="<?php echo esc_url(get_permalink($meeting_id)); ?>" class="btn btn-outline-brand btn-sm ms-2" aria-label="Ver Reunião"><i class="bi bi-eye"></i></a>
-    <a href="<?php echo esc_url($file_url); ?>" class="btn btn-brand btn-sm ms-1" <?php echo $same_domain ? 'download' : 'target="_blank" rel="noopener noreferrer"'; ?> aria-label="Download <?php echo esc_attr($file_name); ?>"><i class="bi bi-download"></i></a>
+    <a href="<?php echo esc_url($file_url); ?>" class="btn btn-primary btn-sm ms-1" <?php echo $same_domain ? 'download' : 'target="_blank" rel="noopener noreferrer"'; ?> aria-label="Download <?php echo esc_attr($file_name); ?>"><i class="bi bi-download"></i></a>
 </div>

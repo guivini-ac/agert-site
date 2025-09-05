@@ -29,7 +29,7 @@ get_header();
             <div class="card-soft p-4 h-100 text-center">
                 <div class="mb-3">
                     <div class="photo d-flex align-items-center justify-content-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" fill="#6b7280" class="bi bi-person" viewBox="0 0 16 16" role="img" aria-label="<?php esc_attr_e('Sem foto', 'agert'); ?>">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" fill="#395DAA" class="bi bi-person" viewBox="0 0 16 16" role="img" aria-label="<?php esc_attr_e('Sem foto', 'agert'); ?>">
                             <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
                             <path fill-rule="evenodd" d="M14 14s-1-4-6-4-6 4-6 4 1 0 6 0 6 0 6 0z" />
                         </svg>

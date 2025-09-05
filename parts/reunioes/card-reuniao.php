@@ -58,6 +58,6 @@ $data_hora = agert_meta($post_id, 'data_hora');
             <span><?php echo esc_html($doc_qtd); ?> <?php _e('documentos', 'agert'); ?></span>
             <span><?php echo $video ? __('Vídeo disponível', 'agert') : __('Vídeo indisponível', 'agert'); ?></span>
         </div>
-        <a href="<?php the_permalink(); ?>" class="btn btn-brand w-100">Ver Detalhes Completos</a>
+        <a href="<?php the_permalink(); ?>" class="btn btn-primary w-100">Ver Detalhes Completos</a>
     </div>
 </div>

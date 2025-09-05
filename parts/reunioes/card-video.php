@@ -85,7 +85,7 @@ $descricao  = $meeting_id ? get_the_excerpt($meeting_id) : wp_trim_words(get_pos
             <span><?php echo $video_url ? __('Vídeo disponível', 'agert') : __('Vídeo indisponível', 'agert'); ?></span>
         </div>
         <?php if ($video_url) : ?>
-            <a href="<?php echo esc_url($video_url); ?>" target="_blank" class="btn btn-brand w-100"><?php _e('Assistir ao vídeo', 'agert'); ?></a>
+            <a href="<?php echo esc_url($video_url); ?>" target="_blank" class="btn btn-primary w-100"><?php _e('Assistir ao vídeo', 'agert'); ?></a>
         <?php endif; ?>
     </div>
 </div>

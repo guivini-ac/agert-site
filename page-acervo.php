@@ -129,7 +129,7 @@ get_header();
                         </select>
                     </div>
                     <div class="col-md-2">
-                        <button type="submit" class="btn btn-brand w-100"><?php _e('Filtrar', 'agert'); ?></button>
+                        <button type="submit" class="btn btn-primary w-100"><?php _e('Filtrar', 'agert'); ?></button>
                     </div>
                 </form>
             </div>
@@ -213,7 +213,7 @@ get_header();
                         <input id="doc-q" type="search" name="doc_q" class="form-control" value="<?php echo esc_attr($doc_search); ?>">
                     </div>
                     <div class="col-md-2">
-                        <button type="submit" class="btn btn-brand w-100"><?php _e('Filtrar', 'agert'); ?></button>
+                        <button type="submit" class="btn btn-primary w-100"><?php _e('Filtrar', 'agert'); ?></button>
                     </div>
                 </form>
             </div>
@@ -364,7 +364,7 @@ get_header();
                         <input id="video-q" type="search" name="video_q" class="form-control" value="<?php echo esc_attr($video_search); ?>">
                     </div>
                     <div class="col-md-2">
-                        <button type="submit" class="btn btn-brand w-100"><?php _e('Filtrar', 'agert'); ?></button>
+                        <button type="submit" class="btn btn-primary w-100"><?php _e('Filtrar', 'agert'); ?></button>
                     </div>
                 </form>
             </div>
@@ -420,46 +420,4 @@ get_header();
             <h5><?php _e('Informações sobre as Reuniões', 'agert'); ?></h5>
             <h6 class="mt-3"><?php _e('Reuniões Ordinárias', 'agert'); ?></h6>
             <p class="mb-1"><?php _e('As reuniões ordinárias da AGERT acontecem mensalmente, sempre na segunda terça-feira do mês, às 14h00.', 'agert'); ?></p>
-            <p class="mb-1"><?php _e('Sede da AGERT - Sala de Reuniões', 'agert'); ?></p>
-            <p class="mb-0"><?php _e('Rua Principal, 123 - Centro', 'agert'); ?></p>
-        </div>
-        <div class="col-md-6">
-            <h5><?php _e('Participação Pública', 'agert'); ?></h5>
-            <p class="mb-1"><?php _e('As reuniões são abertas ao público e transmitidas ao vivo pelo canal oficial da AGERT no YouTube.', 'agert'); ?></p>
-            <p class="mb-0"><?php _e('Para participar presencialmente, entre em contato conosco através dos canais oficiais com antecedência mínima de 48h.', 'agert'); ?></p>
-        </div>
-    </div>
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    var tabs = document.querySelectorAll('#acervoTabs button[data-bs-toggle="tab"]');
-    var yearLinks = document.querySelectorAll('.d-flex.justify-content-center.gap-2 a');
-
-    function updateYearLinks(tab) {
-        yearLinks.forEach(function (link) {
-            var url = new URL(link.href);
-            url.searchParams.set('tab', tab);
-            link.href = url.toString();
-        });
-    }
-
-    var currentTab = new URL(window.location).searchParams.get('tab') || 'reunioes';
-    updateYearLinks(currentTab);
-
-    tabs.forEach(function (btn) {
-        btn.addEventListener('shown.bs.tab', function (event) {
-            var id = event.target.getAttribute('id');
-            var tab = id ? id.replace('-tab', '') : '';
-            if (tab) {
-                var url = new URL(window.location);
-                url.searchParams.set('tab', tab);
-                window.history.replaceState(null, '', url);
-                updateYearLinks(tab);
-            }
-        });
-    });
-});
-</script>
-
-<?php get_footer(); ?>
+            <p class="mb-1"><?php _

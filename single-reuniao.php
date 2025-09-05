@@ -207,7 +207,7 @@ if (have_posts()) :
                                         <div class="doc-row">
                                             <span><?php echo esc_html(get_the_title($doc_post)); ?></span>
                                             <?php if ($size_h) : ?><span class="doc-size"><?php echo esc_html($size_h); ?></span><?php endif; ?>
-                                            <a class="btn btn-brand btn-sm ms-2" href="<?php echo esc_url($file_url); ?>" <?php echo $same_domain ? 'download' : 'target="_blank" rel="noopener noreferrer"'; ?> aria-label="Download <?php echo esc_attr($file_name); ?>" title="Download <?php echo esc_attr($file_name); ?>">
+                                            <a class="btn btn-primary btn-sm ms-2" href="<?php echo esc_url($file_url); ?>" <?php echo $same_domain ? 'download' : 'target="_blank" rel="noopener noreferrer"'; ?> aria-label="Download <?php echo esc_attr($file_name); ?>" title="Download <?php echo esc_attr($file_name); ?>">
                                                 <i class="bi bi-download"></i>
                                             </a>
                                         </div>
