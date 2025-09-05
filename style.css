@@ -14,11 +14,11 @@ Requires PHP: 7.4
 
 /* ===== VARIÁVEIS CSS BASEADAS NO DESIGN SYSTEM ORIGINAL ===== */
 :root {
-  /* Cores principais (baseadas no design original) */
-  --agert-primary: #030213;
-  --agert-primary-rgb: 3, 2, 19;
+  /* Paleta principal baseada nas cores da logo */
+  --agert-primary: #395daa; /* azul */
+  --agert-primary-rgb: 57, 93, 170;
   --agert-primary-foreground: #ffffff;
-  --agert-secondary: #ececf0;
+  --agert-secondary: #f2bc26; /* amarelo */
   --agert-secondary-foreground: #030213;
   --agert-background: #ffffff;
   --agert-foreground: #212529;
@@ -26,6 +26,20 @@ Requires PHP: 7.4
   --agert-muted-light: #f8f9fa;
   --agert-border: rgba(0, 0, 0, 0.1);
   --agert-border-light: rgba(0, 0, 0, 0.05);
+
+  /* Variantes de cor */
+  --agert-primary-dark: #2d4a88; /* azul escurecido para hover */
+
+  /* Sobrescritas do Bootstrap */
+  --bs-primary: var(--agert-primary);
+  --bs-primary-rgb: var(--agert-primary-rgb);
+  --bs-warning: var(--agert-secondary);
+  --bs-warning-rgb: 242, 188, 38;
+  --bs-link-color: var(--agert-primary);
+  --bs-link-color-rgb: var(--agert-primary-rgb);
+  --bs-link-hover-color: var(--agert-primary-dark);
+  --bs-link-hover-color-rgb: 45, 74, 136;
+
   
   /* Tipografia */
   --agert-font-size-base: 14px;

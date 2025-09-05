@@ -1,17 +1,18 @@
 :root{
-  --brand:#0B0A14;        /* preto do tema */
-  --brand-600:#0B0A14;
-  --brand-700:#151320;    /* hover */
-  --ink:#111827; 
-  --muted:#6B7280; 
-  --line:#EEF0F3; 
-  --bg:#F7F8FA; 
+  --brand:#395daa;        /* azul principal */
+  --brand-600:#395daa;
+  --brand-700:#2d4a88;    /* hover */
+  --highlight:#f2bc26;    /* amarelo */
+  --ink:#111827;
+  --muted:#6B7280;
+  --line:#EEF0F3;
+  --bg:#F7F8FA;
   --white:#fff;
-  --success:#16a34a; 
-  --warning:#f59e0b; 
+  --success:#16a34a;
+  --warning:#f59e0b;
   --danger:#ef4444;
-  --radius-card:16px; 
-  --radius-chip:999px; 
+  --radius-card:16px;
+  --radius-chip:999px;
   --shadow:0 6px 18px rgba(0,0,0,.06);
 }
 
