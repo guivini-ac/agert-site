@@ -14,11 +14,11 @@ Requires PHP: 7.4
 
 /* ===== VARIÁVEIS CSS BASEADAS NO DESIGN SYSTEM ORIGINAL ===== */
 :root {
-  /* Cores principais (baseadas no design original) */
-  --agert-primary: #030213;
-  --agert-primary-rgb: 3, 2, 19;
+  /* Paleta principal baseada nas cores da logo */
+  --agert-primary: #395daa; /* azul */
+  --agert-primary-rgb: 57, 93, 170;
   --agert-primary-foreground: #ffffff;
-  --agert-secondary: #ececf0;
+  --agert-secondary: #f2bc26; /* amarelo */
   --agert-secondary-foreground: #030213;
   --agert-background: #ffffff;
   --agert-foreground: #212529;
