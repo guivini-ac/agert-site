@@ -1,0 +1,145 @@
+:root{
+  --brand:#395DAA;        /* azul principal da logo */
+  --brand-600:#395DAA;
+  --brand-700:#2d4a88;    /* hover */
+  --highlight:#F2BC26;    /* amarelo da logo */
+  --ink:#111827;
+  --muted:#6B7280;
+  --line:#EEF0F3;
+  --bg:#F7F8FA;
+  --white:#FFFFFF;
+  --success:#16a34a;
+  --warning:#f59e0b;
+  --danger:#ef4444;
+  --radius-card:16px;
+  --radius-chip:999px;
+  --shadow:0 6px 18px rgba(0,0,0,.06);
+  
+  /* Variações das cores da logo */
+  --brand-light:rgba(57, 93, 170, 0.1);
+  --highlight-light:rgba(242, 188, 38, 0.1);
+  --brand-dark:#2d4a88;
+  --highlight-dark:#d4a520;
+}
+
+.btn-brand{
+  background:var(--brand);
+  border-color:var(--brand);
+  color:var(--white);
+}
+.btn-brand:hover{
+  background:var(--brand-700);
+  border-color:var(--brand-700);
+  color:var(--white);
+}
+.btn-outline-brand{
+  color:var(--brand);
+  border-color:var(--brand);
+  background:transparent;
+}
+.btn-outline-brand:hover{
+  background:var(--brand);
+  color:var(--white);
+  border-color:var(--brand);
+}
+
+.btn-highlight{
+  background:var(--highlight);
+  border-color:var(--highlight);
+  color:#030213;
+}
+.btn-highlight:hover{
+  background:var(--highlight-dark);
+  border-color:var(--highlight-dark);
+  color:#030213;
+}
+.btn-outline-highlight{
+  color:var(--highlight);
+  border-color:var(--highlight);
+  background:transparent;
+}
+.btn-outline-highlight:hover{
+  background:var(--highlight);
+  color:#030213;
+  border-color:var(--highlight);
+}
+
+.badge-chip{
+  background:var(--brand-light);
+  border:1px solid var(--brand);
+  border-radius:var(--radius-chip);
+  color:var(--brand);
+  padding:.25rem .6rem;
+  font-size:.85rem;
+  display:inline-block;
+}
+
+.badge-chip.highlight{
+  background:var(--highlight-light);
+  border:1px solid var(--highlight);
+  color:var(--highlight-dark);
+}
+
+.card-soft{
+  background:var(--white);
+  border:1px solid var(--line);
+  border-radius:var(--radius-card);
+  box-shadow:var(--shadow);
+}
+
+.page-bg{
+  background:var(--bg);
+}
+
+.duration-badge{
+  position:absolute;
+  right:.5rem;
+  bottom:.5rem;
+  background:rgba(0,0,0,.7);
+  color:var(--white);
+  font-size:.75rem;
+  padding:.2rem .4rem;
+  border-radius:.4rem;
+}
+
+.thumb-16x9{
+  aspect-ratio:16/9;
+  object-fit:cover;
+  border-radius:12px;
+}
+
+/* Tabs ativas */
+.tabbar .btn.btn-brand {
+  background: var(--brand);
+  color: var(--white);
+  border-color: var(--brand);
+}
+
+.tabbar .btn.btn-outline-brand {
+  color: var(--brand);
+  border-color: var(--brand);
+  background: transparent;
+}
+
+/* Pills de ano */
+.pills-ano .btn-brand {
+  background: var(--brand);
+  color: var(--white);
+  border-color: var(--brand);
+}
+
+.pills-ano .btn-outline-brand {
+  color: var(--brand);
+  border-color: var(--brand);
+  background: transparent;
+}
+
+/* Classes de utilidade para as cores da logo */
+.text-brand { color: var(--brand) !important; }
+.text-highlight { color: var(--highlight) !important; }
+.bg-brand { background-color: var(--brand) !important; color: var(--white) !important; }
+.bg-highlight { background-color: var(--highlight) !important; color: #030213 !important; }
+.bg-brand-light { background-color: var(--brand-light) !important; }
+.bg-highlight-light { background-color: var(--highlight-light) !important; }
+.border-brand { border-color: var(--brand) !important; }
+.border-highlight { border-color: var(--highlight) !important; }

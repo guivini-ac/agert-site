@@ -1,0 +1,32 @@
+.page-presidente { background:var(--bg); }
+.card-title-sm { font-size:1rem; font-weight:600; }
+.label-muted { color:var(--muted); font-size:.9rem; }
+.photo { 
+    width:240px; 
+    height:240px; 
+    object-fit:cover; 
+    border-radius:50%; 
+    overflow:hidden; 
+    background:var(--brand-light); 
+    display:block; 
+    margin:0 auto; 
+    border: 3px solid var(--brand);
+}
+.item-row { padding:.6rem 0; border-bottom:1px solid var(--line); }
+.item-row:last-child { border-bottom:none; }
+.item-head { display:flex; align-items:center; justify-content:space-between; gap:1rem; }
+.item-title { font-weight:600; }
+.item-sub { color:var(--muted); font-size:.9rem; }
+blockquote.presidente-quote { 
+    border-left:4px solid var(--brand); 
+    padding-left:1rem; 
+    margin:0; 
+    font-style:italic; 
+    color:var(--ink); 
+    background:var(--brand-light);
+    padding:1rem;
+    border-radius:0 var(--radius-card) var(--radius-card) 0;
+}
+.signature { text-align:right; margin-top:.75rem; }
+.signature .name { font-weight:700; }
+.signature .role { color:var(--muted); font-size:.9rem; }

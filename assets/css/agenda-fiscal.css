@@ -1,0 +1,39 @@
+.post-type-archive-agenda_fiscal { background: var(--bg); }
+
+.agenda-card { border: 1px solid var(--line); border-radius: 12px; }
+
+.agenda-card .badge { 
+    background: var(--brand); 
+    color: var(--white);
+}
+
+.agenda-card small { color: var(--muted); }
+
+.agenda-filters { 
+    border: 1px solid var(--brand); 
+    border-radius: 8px; 
+    padding: 1rem; 
+    background: var(--brand-light); 
+}
+
+.agenda-filters .form-control,
+.agenda-filters .form-select {
+    border-color: var(--brand);
+}
+
+.agenda-filters .form-control:focus,
+.agenda-filters .form-select:focus {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 0.2rem rgba(57, 93, 170, 0.25);
+}
+
+.agenda-pagination { display: flex; justify-content: center; }
+.agenda-pagination .page-numbers { 
+    margin: 0 .25rem; 
+    color: var(--brand);
+}
+
+.agenda-pagination .page-numbers:hover {
+    background-color: var(--brand);
+    color: var(--white);
+}
